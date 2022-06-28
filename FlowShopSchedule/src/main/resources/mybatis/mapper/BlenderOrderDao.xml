@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxlotek.flowshopschedule.dao.BlenderOrderDao">
+    <resultMap id="BaseResultMap" type="com.cxlotek.flowshopschedule.PO.BlenderOrder">
+        <result column="order_id" jdbcType="INTEGER" property="orderId"/>
+        <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="planned_start_date" jdbcType="TIMESTAMP" property="plannedStartDate"/>
+        <result column="planned_end_date" jdbcType="TIMESTAMP" property="plannedEndDate"/>
+        <result column="start_date" jdbcType="TIMESTAMP" property="startDate"/>
+        <result column="order_quantity" jdbcType="INTEGER" property="orderQuantity"/>
+        <result column="product_model" jdbcType="VARCHAR" property="productModel"/>
+        <result column="merchandiser" jdbcType="VARCHAR" property="merchandiser"/>
+        <result column="comment" jdbcType="VARCHAR" property="comment"/>
+        <result column="file_number" jdbcType="VARCHAR" property="fileNumber"/>
+    </resultMap>
+    <insert id="insert" parameterType="com.cxlotek.flowshopschedule.PO.BlenderOrder">
+        insert into blender_order (order_id, customer_name, planned_start_date,
+                                   planned_end_date, start_date, order_quantity,
+                                   product_model, merchandiser, `comment`,
+                                   file_number)
+        values (#{orderId,jdbcType=INTEGER}, #{customerName,jdbcType=VARCHAR}, #{plannedStartDate,jdbcType=TIMESTAMP},
+                #{plannedEndDate,jdbcType=TIMESTAMP}, #{startDate,jdbcType=TIMESTAMP},
+                #{orderQuantity,jdbcType=INTEGER},
+                #{productModel,jdbcType=VARCHAR}, #{merchandiser,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR},
+                #{fileNumber,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.cxlotek.flowshopschedule.PO.BlenderOrder">
+        insert into blender_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">
+                order_id,
+            </if>
+            <if test="customerName != null">
+                customer_name,
+            </if>
+            <if test="plannedStartDate != null">
+                planned_start_date,
+            </if>
+            <if test="plannedEndDate != null">
+                planned_end_date,
+            </if>
+            <if test="startDate != null">
+                start_date,
+            </if>
+            <if test="orderQuantity != null">
+                order_quantity,
+            </if>
+            <if test="productModel != null">
+                product_model,
+            </if>
+            <if test="merchandiser != null">
+                merchandiser,
+            </if>
+            <if test="comment != null">
+                `comment`,
+            </if>
+            <if test="fileNumber != null">
+                file_number,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">
+                #{orderId,jdbcType=INTEGER},
+            </if>
+            <if test="customerName != null">
+                #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="plannedStartDate != null">
+                #{plannedStartDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="plannedEndDate != null">
+                #{plannedEndDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="startDate != null">
+                #{startDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orderQuantity != null">
+                #{orderQuantity,jdbcType=INTEGER},
+            </if>
+            <if test="productModel != null">
+                #{productModel,jdbcType=VARCHAR},
+            </if>
+            <if test="merchandiser != null">
+                #{merchandiser,jdbcType=VARCHAR},
+            </if>
+            <if test="comment != null">
+                #{comment,jdbcType=VARCHAR},
+            </if>
+            <if test="fileNumber != null">
+                #{fileNumber,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into blender_order (order_id, customer_name, planned_start_date,
+        planned_end_date, start_date, order_quantity,
+        product_model, merchandiser, `comment`,
+        file_number)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.orderId,jdbcType=INTEGER}, #{item.customerName,jdbcType=VARCHAR},
+            #{item.plannedStartDate,jdbcType=TIMESTAMP},
+            #{item.plannedEndDate,jdbcType=TIMESTAMP}, #{item.startDate,jdbcType=TIMESTAMP},
+            #{item.orderQuantity,jdbcType=INTEGER},
+            #{item.productModel,jdbcType=VARCHAR}, #{item.merchandiser,jdbcType=VARCHAR},
+            #{item.comment,jdbcType=VARCHAR},
+            #{item.fileNumber,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+</mapper>

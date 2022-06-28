@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/flow_shop_schedule?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      filters: stat,wall
+      aop-patterns: com.example.flowshopschedule.*
+      stat-view-servlet:
+        enabled: true
+        login-username: admin
+        login-password: admin
+      web-stat-filter:
+        enabled: true
+      filter:
+        stat:
+          log-slow-sql: true
+        wall:
+          enabled: true
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true  #数据库表中的下划线自动转换为驼峰
+  #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mybatis/mapper/**/*.xml

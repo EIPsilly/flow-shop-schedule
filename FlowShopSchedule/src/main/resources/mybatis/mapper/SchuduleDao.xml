@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxlotek.flowshopschedule.dao.SchuduleDao">
+  <resultMap id="BaseResultMap" type="com.cxlotek.flowshopschedule.PO.Schudule">
+    <result column="order_id" jdbcType="INTEGER" property="orderId" />
+    <result column="customer_name" jdbcType="VARCHAR" property="customerName" />
+    <result column="date" jdbcType="TIMESTAMP" property="date" />
+    <result column="production_quantity" jdbcType="INTEGER" property="productionQuantity" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cxlotek.flowshopschedule.PO.Schudule">
+    insert into schudule (order_id, customer_name, `date`, 
+      production_quantity)
+    values (#{orderId,jdbcType=INTEGER}, #{customerName,jdbcType=VARCHAR}, #{date,jdbcType=TIMESTAMP}, 
+      #{productionQuantity,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cxlotek.flowshopschedule.PO.Schudule">
+    insert into schudule
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="customerName != null">
+        customer_name,
+      </if>
+      <if test="date != null">
+        `date`,
+      </if>
+      <if test="productionQuantity != null">
+        production_quantity,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="orderId != null">
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="customerName != null">
+        #{customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="productionQuantity != null">
+        #{productionQuantity,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+</mapper>

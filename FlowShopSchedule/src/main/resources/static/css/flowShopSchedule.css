@@ -1,0 +1,29 @@
+#scheduleSvg {
+  display: flex;
+  width: 100vw;
+  height: 60vh;
+}
+#scheduleSvg #scheduleSvgLeft,
+#scheduleSvg #scheduleSvgRight {
+  flex: 1;
+  border: 1px solid black;
+  margin: 10px;
+}
+#fileChoose #uploadFile {
+  margin: 20px 0px 50px 0px;
+}
+#fileChoose h3 {
+  margin-bottom: 10px;
+}
+#fileChoose #fileList li p {
+  float: left;
+  margin: 0;
+}
+#fileChoose #fileList li span {
+  float: right;
+  cursor: pointer;
+}
+#fileChoose #fileList li:hover {
+  background-color: #007BFF;
+  color: white;
+}
