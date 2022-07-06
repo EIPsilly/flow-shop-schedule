@@ -1,3 +1,94 @@
+::-webkit-scrollbar {
+  display: none;
+  /* Chrome Safari */
+}
+#myBar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  align-items: center;
+}
+#myBar #leftNav {
+  display: flex;
+}
+#myBar #leftNav .nav-pills .nav-item {
+  border-radius: 5px;
+}
+#myBar #leftNav .nav-pills .nav-item .active {
+  background-color: #00000000;
+  font-weight: 600;
+}
+#myBar #leftNav .nav-pills .nav-item a {
+  color: white;
+}
+#myBar #leftNav .nav-pills .nav-item:hover {
+  background-color: #3B5367;
+}
+#myBar #currentFileArea {
+  margin: 0;
+  color: white;
+  font-size: 18px;
+  position: relative;
+  float: right;
+}
+#arrangeProductionPlanTag,
+#scheduleDiagramTag {
+  width: 100%;
+  max-width: 100%;
+}
+#arrangeProductionPlan #temporalInterval {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+}
+#arrangeProductionPlan #temporalInterval .form-group {
+  display: flex;
+  flex-direction: column;
+  margin: 0px 30px;
+}
+#arrangeProductionPlan #temporalInterval .form-group label {
+  font-weight: 600;
+}
+#arrangeProductionPlan #temporalInterval #startDateInputMessage,
+#arrangeProductionPlan #temporalInterval #endDateInputMessage {
+  color: red;
+}
+#arrangeProductionPlan th,
+#arrangeProductionPlan td {
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: 5px;
+  height: 43px;
+}
+#arrangeProductionPlan th {
+  height: 60px;
+}
+#arrangeProductionPlan .scheduleListTitle {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+}
+#arrangeProductionPlan #arrangeArea {
+  display: flex;
+}
+#arrangeProductionPlan #arrangeArea #order_list {
+  flex: 3;
+}
+#arrangeProductionPlan #arrangeArea #order_list td {
+  overflow-x: auto;
+  max-width: 300px;
+}
+#arrangeProductionPlan #arrangeArea .scheduleList {
+  flex: 7;
+  overflow-x: auto;
+}
+#arrangeProductionPlan .selectedCell {
+  border: 2px solid black;
+}
+#orderInfo {
+  font-weight: 600;
+}
 #scheduleSvg {
   display: flex;
   width: 100vw;

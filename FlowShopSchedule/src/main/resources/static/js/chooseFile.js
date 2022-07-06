@@ -1,16 +1,9 @@
-function showCandidates() {
-    $("#fileList").show();
-    fileName = $("#selectedFile").val();
-    $("#fileList li").each(function() {
-        if ($(this).text().search(new RegExp(fileName, 'i')) != -1) {
-            $(this).css("display", "block");
-        } else {
-            $(this).css("display", "none");
-        }
-        console.log($(this).text().search(new RegExp(fileName, 'i')));
-    })
-}
+// 标签页切换
+$("#chooseFileButton").click(function() {
+    $(this).tab('show');
+})
 
+// 选中一个文件时
 function selectFile(item) {
     $("#fileList").toggle();
     item.siblings().removeClass("active");
@@ -19,8 +12,21 @@ function selectFile(item) {
     $("#currentFile").text(item.children("p").text())
 }
 
-$("#selectedFile").bind("input propertychange", showCandidates);
+// 输入框内容改变时修改 文件列表内容
+$("#selectedFile").bind("input propertychange", function showCandidates() {
+    $("#fileList").show();
+    fileName = $("#selectedFile").val();
+    $("#fileList li").each(function() {
+        if ($(this).text().search(new RegExp(fileName, 'i')) != -1) {
+            $(this).css("display", "block");
+        } else {
+            $(this).css("display", "none");
+        }
+        // console.log($(this).text().search(new RegExp(fileName, 'i')));
+    })
+});
 
+// 上下选择文件
 $("#selectedFile").keydown(function(event) {
     console.log(event.which);
     let selected = $("#fileList li.active");
@@ -43,23 +49,30 @@ $("#selectedFile").keydown(function(event) {
     }
 });
 
+// 点击输入框
 $("#selectedFile").click(function() {
     $("#fileList").toggle();
     $("#selectedFile").val("");
-    showCandidates();
 })
 
-$("#fileList li span").click(function(event) {
+// 删除文件
+$("#fileList").on("click", "li span", function(event) {
     event.stopPropagation();
-    $(this).parent().remove();
-    console.log();
+    let li = $(this).parent();
+    deleteByFileName(li.children("p").text());
+    if (li.attr("class").search("active") != -1) {
+        $("#currentFile").text("")
+    }
+    console.log(li.attr("class").search("active"));
+    li.remove();
 })
 
-
-$("#fileList li").click(function(event) {
+// 点击文件时
+$("#fileList").on("click", "li", function() {
     selectFile($(this));
 })
 
+// 选择要上传的文件
 $("#customFile").change(function(event) {
     let str = $(this).val();
     if (str !== "") {
@@ -78,6 +91,20 @@ $("#customFile").change(function(event) {
     }
 })
 
+// 上传文件按钮被点击
 $("#uploadFile").click(function() {
     uploadFile();
 })
+
+// 获取数据库内的所有文件名
+function listAllFileName(fileNameList) {
+    $("#fileList").html("")
+    for (let idx in fileNameList) {
+        console.log(idx);
+        $("#fileList").append(
+            `<li class="list-group-item">
+        <p>` + fileNameList[idx] + `</p>
+        <span>&times;</span>
+        </li>`);
+    }
+}

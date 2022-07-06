@@ -1,21 +1,39 @@
-var weekday = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-var month = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+function deepCopy(obj, cache = new WeakMap()) {
+    if (!obj instanceof Object) {
+        return obj;
+    }
+    // 防止循环引用
+    if (cache.get(obj)) {
+        return cache.get(obj)
+    }
+    // 支持函数
+    if (obj instanceof Function) {
+        return function() {
+            obj.apply(this, arguments);
+        }
+    }
+    // 支持日期
+    if (obj instanceof Date) {
+        return new Date(obj)
+    }
+    // 支持正则对象
+    if (obj instanceof RegExp) {
+        return new RegExp(obj.source, obj.flags)
+    }
+    // 还可以增加其他对象,比如:map, set 等,根据情况判断增加极客
 
-var start_date = new Date(2022, 5, 1);
-var end_date = new Date(2022, 5, 30);
+    // 数组是 key 为数字的特殊对象
+    const res = Array.isArray(obj) ? [] : {}
 
-function temp(container) {
-    const width = $(container).innerWidth();
-    const height = $(container).innerHeight();
+    // 缓存 copy 的对象,用于处理循环引用的情况
+    cache.set(obj, res)
 
-    let svg = d3.select(container).append("svg")
-        .attr("id", "dependencyParsingSVG")
-        .attr("width", width)
-        .attr("height", height)
-        .attr("style", "background-color: #F9FCFF");
-
-    const cx = d => d.day * width / 7;
+    Object.keys(obj).forEach(key => {
+        if (obj[key] instanceof Object) {
+            res[key] = deepCopy(obj[key], cache)
+        } else {
+            res[key] = obj[key]
+        }
+    })
+    return res
 }
-
-// temp("#scheduleSvgLeft")
-// temp("#scheduleSvgRight")

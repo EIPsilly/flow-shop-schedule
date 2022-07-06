@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/bootstrap.css">
-    <link rel="stylesheet" href="./css/nav.css">
     <link rel="stylesheet" href="./css/flowShopSchedule.css">
     <script src="./js/jquery-3.4.1.js"></script>
+    <script src="./js/popper.min.js"></script>
     <script src="./js/bootstrap.bundle.js"></script>
     <script src="./js/bootstrap.js"></script>
     <script src="./js/d3.min.js"></script>
@@ -16,133 +16,68 @@
 
 <body>
     <nav class="navbar navbar-expand-sm bg-dark navbar-dark" id="myBar">
-        <a class="navbar-brand" href="#">生产安排</a>
-        <ul class="nav nav-pills">
-            <li class="nav-item">
-                <a href="#arrangeProductionPlanTag" class="nav-link active" data-toggle="pill">流水安排</a>
-            </li>
-            <li class="nav-item">
-                <a href="#scheduleDiagramTag" class="nav-link" data-toggle="pill">安排一览</a>
-            </li>
-            <li class="nav-item">
-                <a href="#fileChooseTag" class="nav-link" data-toggle="pill">文件选择</a>
-            </li>
-        </ul>
+        <div id="leftNav">
+            <a class="navbar-brand" href="#">生产安排</a>
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a href="#arrangeProductionPlanTag" class="nav-link active" id="arrangeProductionButton">流水安排</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#scheduleDiagramTag" class="nav-link" id="scheduleDiagramButton">安排一览</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#fileChooseTag" class="nav-link" id="chooseFileButton">文件选择</a>
+                </li>
+            </ul>
+        </div>
+        <p id="currentFileArea">当前文件：<span id="currentFile">a13.xlsx</span></p>
     </nav>
     <div id="myTabContent" class="tab-content">
-        <div class="container tab-pane fade" id="arrangeProductionPlanTag">
+        <div class="container tab-pane active" id="arrangeProductionPlanTag">
             <div id="arrangeProductionPlan">
-                <div id="order_list">
-                    <table class="table table-bordered table-striped table-hover">
-                        <tbody>
-                            <tr>
-                                <th>计划日期</th>
-                                <th>实际日期</th>
-                                <th>客户名称</th>
-                                <th>跟单员</th>
-                                <th>产品型号</th>
-                                <th>订单数量</th>
-                                <th>剩余数量</th>
-                            </tr>
-                            <tr>
-                                <td>6/1</td>
-                                <td>6/1</td>
-                                <td>巴西 ichef 1单</td>
-                                <td>许梦琪</td>
-                                <td>"BL-101B蓝色127aaaaaaV"</td>
-                                <td>2391</td>
-                                <td>2391 </td>
-                            </tr>
-                            <tr>
-                                <td>6/1</td>
-                                <td>6/1</td>
-                                <td>巴西 ichef 1单</td>
-                                <td>许梦琪</td>
-                                <td>"BL-101B蓝色127V"</td>
-                                <td>2391</td>
-                                <td>2391 </td>
-                            </tr>
-                            <tr>
-                                <td>6/1</td>
-                                <td>6/1</td>
-                                <td>巴西 ichef 1单</td>
-                                <td>许梦琪</td>
-                                <td>"BL-101B蓝色127V"</td>
-                                <td>2391</td>
-                                <td>2391 </td>
-                            </tr>
-                            <tr>
-                                <td>6/1</td>
-                                <td>6/1</td>
-                                <td>巴西 ichef 1单</td>
-                                <td>许梦琪</td>
-                                <td>"BL-101B蓝色127V"</td>
-                                <td>2391</td>
-                                <td>2391 </td>
-                            </tr>
-                            <tr>
-                                <td>6/1</td>
-                                <td>6/1</td>
-                                <td>巴西 ichef 1单</td>
-                                <td>许梦琪</td>
-                                <td>"BL-101B蓝色127V"</td>
-                                <td>2391</td>
-                                <td>2391 </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div id="temporalInterval">
+                    <div class="form-group">
+                        <label>开始日期</label>
+                        <input type="text" class="form-control" value="2022-06-01" id="startDate">
+                        <p id="startDateInputMessage"><br/></p>
+                    </div>
+                    <div class="form-group">
+                        <label>结束日期</label>
+                        <input type="text" class="form-control" value="2022-06-30" id="endDate">
+                        <p id="endDateInputMessage"><br/></p>
+                    </div>
+                    <div class="form-group">
+                        <label><br/></label>
+                        <button type="button" class="btn btn-primary" id="createScheduleListTable">生成流水表</button>
+                        <p><br/></p>
+                    </div>
+                    <div class="form-group">
+                        <label><br/></label>
+                        <button type="button" class="btn btn-primary" id="switchPipeline">切换流水线</button>
+                        <p><br/></p>
+                    </div>
                 </div>
-                <div id="scheduleList">
-                    <table class="table table-bordered table-striped table-hover">
-                        <tbody>
-                            <tr>
-                                <th>6/2<br/>周一</th>
-                                <th>6/3<br/>周一</th>
-                                <th>6/4<br/>周一</th>
-                                <th>6/5<br/>周一</th>
-                                <th>6/6<br/>周一</th>
-                                <th>6/7<br/>周一</th>
-                                <th>6/8<br/>周一</th>
-                                <th>6/9<br/>周一</th>
-                                <th>6/10<br/>周一</th>
-                                <th>6/11<br/>周一</th>
-                                <th>6/12<br/>周一</th>
-                                <th>6/13<br/>周一</th>
-                                <th>6/14<br/>周一</th>
-                                <th>6/15<br/>周一</th>
-                                <th>6/16<br/>周一</th>
-                                <th>6/17<br/>周一</th>
-                                <th>6/18<br/>周一</th>
-                                <th>6/19<br/>周一</th>
-                                <th>6/20<br/>周一</th>
-                            </tr>
-                            <tr>
-                                <td date-index="0" order-index="0">6</td>
-                                <td date-index="1" order-index="0">6</td>
-                                <td date-index="2" order-index="0">6</td>
-                                <td date-index="3" order-index="0">6</td>
-                                <td date-index="4" order-index="0">6</td>
-                                <td date-index="5" order-index="0">6</td>
-                                <td date-index="6" order-index="0">6</td>
-                                <td date-index="7" order-index="0">6</td>
-                                <td date-index="8" order-index="0">60</td>
-                                <td date-index="9" order-index="0">61</td>
-                                <td date-index="10" order-index="0">62</td>
-                                <td date-index="11" order-index="0">63</td>
-                                <td date-index="12" order-index="0">64</td>
-                                <td date-index="13" order-index="0">65</td>
-                                <td date-index="14" order-index="0">66</td>
-                                <td date-index="15" order-index="0">67</td>
-                                <td date-index="16" order-index="0">68</td>
-                                <td date-index="17" order-index="0">69</td>
-                                <td date-index="18" order-index="0">60</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div id="arrangeArea">
+                    <div id="order_list">
+                        <p class="scheduleListTitle">订单列表</p>
+                        <table class="table table-bordered table-striped table-hover">
+                        </table>
+                    </div>
+                    <div id="scheduleList0" class="scheduleList">
+                        <p class="scheduleListTitle">流水线一</p>
+                        <table class="table table-bordered table-striped table-hover">
+                        </table>
+                    </div>
+                    <div id="scheduleList1" class="scheduleList" style="display: none;">
+                        <p class="scheduleListTitle">流水线二</p>
+                        <table class="table table-bordered table-striped table-hover">
+                        </table>
+                    </div>
                 </div>
+
             </div>
         </div>
-        <div class="container tab-pane fade" id="scheduleDiagramTag">
+        <div class="container tab-pane" id="scheduleDiagramTag">
             <div id="scheduleSvg">
                 <div id="scheduleSvgLeft">
 
@@ -152,7 +87,7 @@
                 </div>
             </div>
         </div>
-        <div class="container tab-pane active" id="fileChooseTag">
+        <div class="container tab-pane" id="fileChooseTag">
             <div id="fileChoose">
                 <h3><b>文件上传</b></h3>
                 <div class="custom-file" id="upload">
@@ -162,27 +97,91 @@
                 <button class="btn btn-secondary" id="uploadFile">上传文件</button>
 
                 <h3><b>选择文件</b></h3>
-                <p>当前文件：<span id="currentFile">俄罗斯</span></p>
-                <input type="text" class="form-control" id="selectedFile" value="俄罗斯">
-                <ul class="list-group" id="fileList">
-                    <li class="list-group-item active">
-                        <p>俄罗斯</p>
-                        <span>&times;</span>
-                    </li>
-                    <li class="list-group-item">
-                        <p>美国</p>
-                        <span>&times;</span>
-                    </li>
-                    <li class="list-group-item">
-                        <p>中国</p>
-                        <span>&times;</span>
-                    </li>
-                </ul>
+                <div id="selectFileArea">
+                    <input type="text" class="form-control" id="selectedFile" value="">
+                    <ul class="list-group" id="fileList">
+                        <li class="list-group-item active">
+                            <p>俄罗斯</p>
+                            <span>&times;</span>
+                        </li>
+                        <li class="list-group-item">
+                            <p>美国</p>
+                            <span>&times;</span>
+                        </li>
+                        <li class="list-group-item">
+                            <p>中国</p>
+                            <span>&times;</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
+    <!--删除文件模态框 -->
+    <div class="modal fade" id="deleteFile">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- 模态框头部 -->
+                <div class="modal-header">
+                    <h4 class="modal-title">模态框头部</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- 模态框主体 -->
+                <div class="modal-body">
+                    模态框内容..
+                </div>
+
+                <!-- 模态框底部 -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加安排模态框 -->
+    <div class="modal" id="addPlanModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- 模态框头部 -->
+                <div class="modal-header">
+                    <h4 class="modal-title">安排计划</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- 模态框主体 -->
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>对应订单：</label>
+                        <p id="orderInfo"></p>
+                    </div>
+                    <div class="form-group">
+                        <label id="labelName">生产数量：</label>
+                        <input type="text" class="form-control" id="productionQuantity">
+                    </div>
+                </div>
+
+                <!-- 模态框底部 -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="addPlanModalConfirmButton">确定</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="addPlanModalQuitButton">关闭</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script src="./js/flowShopSchedule.js"></script>
     <script src="./js/flowShopScheduleData.js"></script>
     <script src="./js/arrangeProductionPlan.js"></script>
+    <script src="./js/scheduleDiagram.js"></script>
     <script src="./js/chooseFile.js"></script>
+    <script>
+        getFileList();
+        $('[data-toggle="tooltip"]').tooltip();
+    </script>
 </body>

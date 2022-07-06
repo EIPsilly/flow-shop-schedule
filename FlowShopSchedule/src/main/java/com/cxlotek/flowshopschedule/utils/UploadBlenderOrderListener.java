@@ -29,16 +29,16 @@ public class UploadBlenderOrderListener implements ReadListener<BlenderOrder> {
      */
     private BlenderOrderDao uploadDAO;
 
-    private String fileName;
+    private String fileNumber;
 
     /**
      * 如果使用了spring,请使用这个构造方法。每次创建Listener的时候需要把spring管理的类传进来
      *
      * @param uploadDAO
      */
-    public UploadBlenderOrderListener(BlenderOrderDao uploadDAO,String fileName) {
+    public UploadBlenderOrderListener(BlenderOrderDao uploadDAO,String fileNumber) {
         this.uploadDAO = uploadDAO;
-        this.fileName = fileName;
+        this.fileNumber = fileNumber;
     }
 
     /**
@@ -50,7 +50,7 @@ public class UploadBlenderOrderListener implements ReadListener<BlenderOrder> {
     @Override
     public void invoke(BlenderOrder data, AnalysisContext context) {
         log.info("解析到一条数据:{}", JSON.toJSONString(data));
-        data.setFileNumber(fileName);
+        data.setFileNumber(fileNumber);
         cachedDataList.add(data);
         // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
         if (cachedDataList.size() >= BATCH_COUNT) {
