@@ -86,6 +86,10 @@
 #arrangeProductionPlan .selectedCell {
   border: 2px solid black;
 }
+#arrangeProductionPlan .errorCell {
+  font-weight: 800;
+  color: red;
+}
 #orderInfo {
   font-weight: 600;
 }

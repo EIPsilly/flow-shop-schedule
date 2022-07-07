@@ -4,7 +4,8 @@
     <resultMap id="BaseResultMap" type="com.cxlotek.flowshopschedule.PO.BlenderOrder">
         <result column="order_id" jdbcType="INTEGER" property="orderId"/>
         <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
-        <result column="planned_start_date" jdbcType="TIMESTAMP" property="plannedStartDate"/>
+        <result column="planned_start_date0" jdbcType="TIMESTAMP" property="plannedStartDate0"/>
+        <result column="planned_start_date1" jdbcType="TIMESTAMP" property="plannedStartDate1"/>
         <result column="planned_end_date" jdbcType="TIMESTAMP" property="plannedEndDate"/>
         <result column="start_date" jdbcType="TIMESTAMP" property="startDate"/>
         <result column="order_quantity" jdbcType="INTEGER" property="orderQuantity"/>
@@ -14,15 +15,14 @@
         <result column="file_number" jdbcType="VARCHAR" property="fileNumber"/>
     </resultMap>
     <insert id="insert" parameterType="com.cxlotek.flowshopschedule.PO.BlenderOrder">
-        insert into blender_order (order_id, customer_name, planned_start_date,
-                                   planned_end_date, start_date, order_quantity,
-                                   product_model, merchandiser, `comment`,
-                                   file_number)
-        values (#{orderId,jdbcType=INTEGER}, #{customerName,jdbcType=VARCHAR}, #{plannedStartDate,jdbcType=TIMESTAMP},
-                #{plannedEndDate,jdbcType=TIMESTAMP}, #{startDate,jdbcType=TIMESTAMP},
-                #{orderQuantity,jdbcType=INTEGER},
-                #{productModel,jdbcType=VARCHAR}, #{merchandiser,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR},
-                #{fileNumber,jdbcType=VARCHAR})
+        insert into blender_order (order_id, customer_name, planned_start_date0,
+                                   planned_start_date1, planned_end_date,
+                                   start_date, order_quantity, product_model,
+                                   merchandiser, `comment`, file_number)
+        values (#{orderId,jdbcType=INTEGER}, #{customerName,jdbcType=VARCHAR}, #{plannedStartDate0,jdbcType=TIMESTAMP},
+                #{plannedStartDate1,jdbcType=TIMESTAMP}, #{plannedEndDate,jdbcType=TIMESTAMP},
+                #{startDate,jdbcType=TIMESTAMP}, #{orderQuantity,jdbcType=INTEGER}, #{productModel,jdbcType=VARCHAR},
+                #{merchandiser,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR}, #{fileNumber,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.cxlotek.flowshopschedule.PO.BlenderOrder">
         insert into blender_order
@@ -33,8 +33,11 @@
             <if test="customerName != null">
                 customer_name,
             </if>
-            <if test="plannedStartDate != null">
-                planned_start_date,
+            <if test="plannedStartDate0 != null">
+                planned_start_date0,
+            </if>
+            <if test="plannedStartDate1 != null">
+                planned_start_date1,
             </if>
             <if test="plannedEndDate != null">
                 planned_end_date,
@@ -65,8 +68,11 @@
             <if test="customerName != null">
                 #{customerName,jdbcType=VARCHAR},
             </if>
-            <if test="plannedStartDate != null">
-                #{plannedStartDate,jdbcType=TIMESTAMP},
+            <if test="plannedStartDate0 != null">
+                #{plannedStartDate0,jdbcType=TIMESTAMP},
+            </if>
+            <if test="plannedStartDate1 != null">
+                #{plannedStartDate1,jdbcType=TIMESTAMP},
             </if>
             <if test="plannedEndDate != null">
                 #{plannedEndDate,jdbcType=TIMESTAMP},
@@ -92,14 +98,16 @@
         </trim>
     </insert>
     <insert id="insertBatch" parameterType="java.util.List">
-        insert into blender_order (order_id, customer_name, planned_start_date,
-        planned_end_date, start_date, order_quantity,
-        product_model, merchandiser, `comment`,
-        file_number)
+        insert into blender_order (order_id, customer_name, planned_start_date0,
+        planned_start_date1, planned_end_date,
+        start_date, order_quantity, product_model,
+        merchandiser, `comment`, file_number
+        )
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.orderId,jdbcType=INTEGER}, #{item.customerName,jdbcType=VARCHAR},
-            #{item.plannedStartDate,jdbcType=TIMESTAMP},
+            #{item.plannedStartDate0,jdbcType=TIMESTAMP},
+            #{item.plannedStartDate1,jdbcType=TIMESTAMP},
             #{item.plannedEndDate,jdbcType=TIMESTAMP}, #{item.startDate,jdbcType=TIMESTAMP},
             #{item.orderQuantity,jdbcType=INTEGER},
             #{item.productModel,jdbcType=VARCHAR}, #{item.merchandiser,jdbcType=VARCHAR},

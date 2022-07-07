@@ -14,11 +14,15 @@ function getOrderByFileName() {
             console.log(res);
             orders = res["blenderOrders"];
             schedule = res["schedules"];
-            initSchedule();
-            convertScheduleToProductionQuantity();
-            scheduleList(0);
-            scheduleList(1);
-            showBlenderOrder(orders);
+            orders.forEach(element => {
+                element.plannedEndDate = element.plannedEndDate == null ? null : new Date(element.plannedEndDate);
+                element.plannedStartDate0 = element.plannedStartDate0 == null ? null : new Date(element.plannedStartDate0);
+                element.plannedStartDate1 = element.plannedStartDate1 == null ? null : new Date(element.plannedStartDate1);
+            });
+            schedule.forEach(element => {
+                element.date = element.date == null ? null : new Date(element.date);
+            });
+            reloadTheSchedule();
             scheduleCellClick("#order_list");
             scheduleCellClick("#scheduleList0");
             scheduleCellClick("#scheduleList1");
