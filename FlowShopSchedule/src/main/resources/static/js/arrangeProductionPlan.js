@@ -71,6 +71,13 @@ $("#switchPipeline").click(function() {
 
 // 初始化生产数量安排表、最大数量表、剩余数量表
 function initSchedule() {
+    orders.sort(function(a, b) {
+        if (current_schedule_index == 0) {
+            return a.plannedStartDate0 - b.plannedStartDate0;
+        } else if (current_schedule_index == 1) {
+            return a.plannedStartDate1 - b.plannedStartDate1;
+        }
+    })
     order_num = orders.length;
     start_date = new Date($("#startDate").val());
     end_date = new Date($("#endDate").val());
@@ -140,7 +147,7 @@ function convertScheduleToProductionQuantity() {
                     col_index = Math.ceil((orders[row_index].plannedStartDate1 - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
                 }
                 for (let cur = col_index; cur < date_num; cur++) {
-                    if (production_quantity[table_index][row_index][cur] == 0) {
+                    if (production_quantity[table_index][row_index][cur] == 0 && residual_production_quantity[table_index][cur] > 0) {
                         if (orders[row_index].residual_quantity > residual_production_quantity[table_index][cur]) {
                             production_quantity[table_index][row_index][cur] = residual_production_quantity[table_index][cur];
                             orders[row_index].residual_quantity -= residual_production_quantity[table_index][cur];
@@ -224,25 +231,6 @@ function reloadTheSchedule() {
     }
 }
 
-function scheduleCellClick(table) {
-    $(table).on("click", "tbody td", function(event) {
-        if ($(this).attr("row-index") == undefined) {
-            return;
-        }
-        if ($(".selectedCell").length == 1) {
-            // 如果两次点击的是同一个块，则取消选中样式
-            if ($(".selectedCell").is($(this))) {
-                $(".selectedCell").removeClass("selectedCell");
-            } else { // 如果两次点击的是不同的块
-                $(".selectedCell").removeClass("selectedCell");
-                $(this).addClass("selectedCell");
-            }
-        } else if ($(".selectedCell").length == 0) {
-            $(this).addClass("selectedCell");
-        }
-    })
-}
-
 function showBlenderOrder(orders) {
     let str = "<tbody>"
     str += `<tr row-index="0">
@@ -301,14 +289,14 @@ function showBlenderOrder(orders) {
 
 // 上下选择单元格
 $(document).keydown(function(event) {
+    console.log("td keydown");
     if ($(".selectedCell").length != 0 && cell_move_flag == true) {
-        event.stopPropagation();
-        row_index = parseInt($(".selectedCell").attr("row-index"));
-        col_index = parseInt($(".selectedCell").attr("col-index"));
-        table_index = parseInt($(".selectedCell").attr("table-index"));
-        console.log(table_index);
+        // event.stopPropagation();
+        let row_index = parseInt($(".selectedCell").attr("row-index"));
+        let col_index = parseInt($(".selectedCell").attr("col-index"));
+        let table_index = parseInt($(".selectedCell").attr("table-index"));
+        let order_col_num = $("#order_list table tr:eq(0) th").length
         if (table_index !== table_index) { //如果是订单表格
-            let order_col_num = $("#order_list table tr:eq(0) th").length
             if (event.keyCode != 13) {
                 switch (event.keyCode) {
                     case 37:
@@ -323,6 +311,11 @@ $(document).keydown(function(event) {
                     case 39:
                         // 39右
                         col_index = Math.min(order_col_num - 1, col_index + 1);
+                        // if (col_index + 1 == order_col_num) { //如果在订单表格的最右边，则跳转到流水安排表格
+                        //     $(".selectedCell").removeClass("selectedCell");
+                        //     $(`td[row-index='` + row_index + `'][col-index='0'][table-index='` + current_schedule_index + `']`).addClass("selectedCell");
+                        //     return;
+                        // } else col_index++;
                         break;
                     case 40:
                         // 40下
@@ -331,11 +324,11 @@ $(document).keydown(function(event) {
                         break;
                 }
                 $(".selectedCell").removeClass("selectedCell");
-                console.log(`td[row-index='` + row_index + `'][col-index='` + col_index + `']`);
+                // console.log(`td[row-index='` + row_index + `'][col-index='` + col_index + `']`);
                 $(`td[row-index='` + row_index + `'][col-index='` + col_index + `']:not([table-index])`).addClass("selectedCell");
             } else {
                 $("#orderInfo").text($(`#order_list table td[row-index=` + row_index + `][col-index=1]`).text() + ` ` + $(`#order_list table td[row-index=` + row_index + `][col-index=0]`).text());
-                console.log(`#order_list table td[row-index=0][col-index=` + col_index + `]`);
+                // console.log(`#order_list table td[row-index=0][col-index=` + col_index + `]`);
                 $("#labelName").text($(`#order_list table th[row-index=0][col-index=` + col_index + `]`).text())
                 $("#productionQuantity").val("");
                 $("#addPlanModal").modal("show");
@@ -346,6 +339,11 @@ $(document).keydown(function(event) {
                     case 37:
                         //37左
                         col_index = Math.max(0, col_index - 1);
+                        // if (col_index - 1 < 0) {
+                        //     $(".selectedCell").removeClass("selectedCell");
+                        //     $(`td[row-index='` + row_index + `'][col-index='` + (order_col_num - 1) + `']:not([table-index])`).addClass("selectedCell");
+                        //     return;
+                        // } else col_index--;
                         break;
                     case 38:
                         // 38上
@@ -379,6 +377,38 @@ $(document).keydown(function(event) {
     console.log("document listen keydown : " + event.keyCode);
 });
 
+//  单元格点击事件
+function scheduleCellClick(table) {
+    $(table).on("click", "tbody td", function(event) {
+        event.stopPropagation();
+        if ($(this).attr("row-index") == undefined) {
+            return;
+        }
+        console.log("点击td");
+        console.log($(this));
+        console.log($(this).html());
+        if ($(".selectedCell").length == 1) {
+            // 如果两次点击的是同一个块，则取消选中样式
+            if ($(".selectedCell").is($(this))) {
+                $(".selectedCell").removeClass("selectedCell");
+            } else { // 如果两次点击的是不同的块
+                $(".selectedCell").removeClass("selectedCell");
+                $(this).addClass("selectedCell");
+            }
+        } else if ($(".selectedCell").length == 0) {
+            $(this).addClass("selectedCell");
+        }
+    })
+}
+scheduleCellClick("#order_list");
+scheduleCellClick("#scheduleList0");
+scheduleCellClick("#scheduleList1");
+
+$(document).click(function() {
+    console.log("点击document");
+    $(".selectedCell").removeClass("selectedCell");
+})
+
 // 修改单元格模态框
 $("#productionQuantity").keydown(function(event) {
     cell_move_flag = false;
@@ -407,7 +437,11 @@ $("#addPlanModalQuitButton").click(function() {
     cell_move_flag = true;
 })
 
-$("#addPlanModalConfirmButton").click(modifyCell())
+$("#addPlanModalConfirmButton").click(function() {
+    modifyCell();
+    $("#addPlanModal").modal("hide");
+    cell_move_flag = true;
+})
 
 function modifyCell() {
     let old_value = $(".selectedCell").text();
@@ -416,25 +450,46 @@ function modifyCell() {
         let row_index = parseInt($(".selectedCell").attr("row-index"));
         let col_index = parseInt($(".selectedCell").attr("col-index"));
         let table_index = parseInt($(".selectedCell").attr("table-index"));
-        // 如果修改了计划开始日期
-        if (col_index == 2 && table_index !== table_index) {
-            console.log("修改了计划开始日期");
-            console.log(row_index);
-            let pattern = /^([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/
-            if (current_schedule_index == 0) {
-                if (pattern.test(new_value) == false) {
-                    orders[row_index].plannedStartDate0 = null;
-                } else {
-                    orders[row_index].plannedStartDate0 = new Date(new_value);
-                    orders[row_index].plannedStartDate0.setFullYear(start_date.getFullYear());
+        if (table_index !== table_index) { //修改订单信息
+            if (col_index == 2) { // 如果修改了计划开始日期
+                console.log("修改了计划开始日期");
+                console.log(row_index);
+                let pattern = /^([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/
+                console.log(pattern.test(new_value));
+                if (current_schedule_index == 0) {
+                    if (pattern.test(new_value) == false) {
+                        orders[row_index].plannedStartDate0 = null;
+                    } else {
+                        orders[row_index].plannedStartDate0 = new Date(new_value);
+                        orders[row_index].plannedStartDate0.setFullYear(start_date.getFullYear());
+                    }
                 }
-            }
-            if (current_schedule_index == 1) {
-                if (pattern.test(new_value) == false) {
-                    orders[row_index].plannedStartDate1 = null;
-                } else {
-                    orders[row_index].plannedStartDate1 = new Date(new_value);
-                    orders[row_index].plannedStartDate1.setFullYear(start_date.getFullYear());
+                if (current_schedule_index == 1) {
+                    if (pattern.test(new_value) == false) {
+                        orders[row_index].plannedStartDate1 = null;
+                    } else {
+                        orders[row_index].plannedStartDate1 = new Date(new_value);
+                        orders[row_index].plannedStartDate1.setFullYear(start_date.getFullYear());
+                    }
+                }
+            } else if (col_index != 6) { //修改剩余数量则无效
+                switch (col_index) {
+                    case 0:
+                        orders[row_index].orderId = new_value;
+                        break;
+                    case 1:
+                        orders[row_index].customerName = new_value;
+                        break;
+                    case 3:
+                        orders[row_index].plannedEndDate = new Date(new_value);
+                        orders[row_index].plannedEndDate.setFullYear(start_date.getFullYear());
+                        break;
+                    case 4:
+                        orders[row_index].orderQuantity = parseInt(new_value);
+                        break;
+                    case 5:
+                        orders[row_index].productModel = new_value;
+                        break;
                 }
             }
             reloadTheSchedule();
@@ -506,7 +561,6 @@ function modifyCell() {
             reloadTheSchedule();
             return;
         }
-        $(".selectedCell").text(new_value);
     }
     cell_move_flag = true;
 }

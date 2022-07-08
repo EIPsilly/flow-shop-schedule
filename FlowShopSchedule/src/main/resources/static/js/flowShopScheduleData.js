@@ -23,9 +23,6 @@ function getOrderByFileName() {
                 element.date = element.date == null ? null : new Date(element.date);
             });
             reloadTheSchedule();
-            scheduleCellClick("#order_list");
-            scheduleCellClick("#scheduleList0");
-            scheduleCellClick("#scheduleList1");
             $("#arrangeProductionButton").tab('show');
         },
         error: function(error) {
