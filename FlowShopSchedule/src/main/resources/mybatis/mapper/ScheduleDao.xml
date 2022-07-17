@@ -60,4 +60,18 @@
       </if>
     </trim>
   </insert>
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into schedule (order_id, customer_name, file_number,
+                          `date`, production_quantity, line_number
+    )
+    values
+        <foreach collection="list" item="item" separator=",">
+          (#{item.orderId,jdbcType=INTEGER},
+           #{item.customerName,jdbcType=VARCHAR},
+           #{item.fileNumber,jdbcType=VARCHAR},
+           #{item.date,jdbcType=TIMESTAMP},
+           #{item.productionQuantity,jdbcType=INTEGER},
+           #{item.lineNumber,jdbcType=INTEGER})
+        </foreach>
+  </insert>
 </mapper>

@@ -11,11 +11,15 @@
     <groupId>com.example</groupId>
     <artifactId>FlowShopSchedule</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
     <name>FlowShopSchedule</name>
     <description>FlowShopSchedule</description>
     <properties>
         <java.version>11</java.version>
     </properties>
+
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -79,14 +83,14 @@
             <version>3.1.1</version>
         </dependency>
         <dependency>
-            　　<groupId>org.apache.poi</groupId>
-            　　<artifactId>poi</artifactId>
-            　　<version>4.1.2</version>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>4.1.2</version>
         </dependency>
         <dependency>
-            　　<groupId>org.apache.poi</groupId>
-            　　<artifactId>poi-ooxml</artifactId>
-            　　<version>4.1.2</version>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>4.1.2</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>

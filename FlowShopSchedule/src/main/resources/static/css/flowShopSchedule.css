@@ -83,12 +83,24 @@
   flex: 7;
   overflow-x: auto;
 }
+#arrangeProductionPlan .selectedRow {
+  background-color: #00000030;
+}
 #arrangeProductionPlan .selectedCell {
   border: 2px solid black;
 }
 #arrangeProductionPlan .errorCell {
   font-weight: 800;
   color: red;
+}
+#arrangeProductionPlan .sundayCell {
+  background-color: #d6454550;
+}
+#arrangeProductionPlan .saturdayCell {
+  background-color: #62a1e050;
+}
+#arrangeProductionPlan .manualCell {
+  background-color: #24c23f50;
 }
 #orderInfo {
   font-weight: 600;

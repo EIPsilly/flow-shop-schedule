@@ -1,5 +1,8 @@
 package com.cxlotek.flowshopschedule.PO;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelProperty;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -11,26 +14,31 @@ public class BlenderOrder implements Serializable {
     /**
      * 单号
      */
+    @ExcelProperty("单号")
     private Integer orderId;
 
     /**
      * 客户名称
      */
+    @ExcelProperty("客户名称")
     private String customerName;
 
     /**
      * 流水线一计划开始日期
      */
+    @ExcelProperty("流水线一计划开始日期")
     private Date plannedStartDate0;
 
     /**
      * 流水线二计划开始日期
      */
+    @ExcelProperty("流水线二计划开始日期")
     private Date plannedStartDate1;
 
     /**
      * 计划结束日期
      */
+    @ExcelProperty("计划结束日期")
     private Date plannedEndDate;
 
     /**
@@ -41,11 +49,13 @@ public class BlenderOrder implements Serializable {
     /**
      * 订单数量
      */
+    @ExcelProperty("订单数量")
     private Integer orderQuantity;
 
     /**
      * 产品型号
      */
+    @ExcelProperty("产品型号")
     private String productModel;
 
     /**

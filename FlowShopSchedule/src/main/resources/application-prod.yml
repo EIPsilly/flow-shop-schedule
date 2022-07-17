@@ -1,0 +1,7 @@
+server:
+  port: 80
+spring:
+  datasource:
+    username: root
+    password: a165EWd.ZB1#65ASJK165
+    url: jdbc:mysql://115.29.209.178:3306/flow_shop_schedule?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai

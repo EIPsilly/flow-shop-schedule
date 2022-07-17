@@ -6,6 +6,7 @@ import com.cxlotek.flowshopschedule.dao.BlenderOrderDao;
 import com.cxlotek.flowshopschedule.dao.ScheduleDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,5 +25,13 @@ public class ArrangeProductionPlanService {
 
     public List<Schedule> selectScheduleByFileNumber(String FileNumber){
         return schuduleDao.selectByFileNumber(FileNumber);
+    }
+
+    @Transactional
+    public void updateScheduleByFileNumber(List<BlenderOrder> orders,List<Schedule> schedule,String fileNumber){
+        schuduleDao.deleteByFileNumber(fileNumber);
+        blenderOrderDao.deleteByFileNumber(fileNumber);
+        blenderOrderDao.insertBatch(orders);
+        schuduleDao.insertBatch(schedule);
     }
 }

@@ -1,5 +1,3 @@
-var have_got_order_by_file_name = false;
-
 // 标签页切换
 $("#arrangeProductionButton").click(function() {
     if ($("#currentFile").text() == "尚未选择") {
@@ -9,19 +7,25 @@ $("#arrangeProductionButton").click(function() {
     }
 })
 
-var orders, schedule, identity_to_row_index, current_schedule_index = 0;
+var orders, //订单列表
+    schedule, //生产安排
+    identity_to_row_index, //根据单号和客户名称获得其在订单列表中的位置
+    current_schedule_index = 0; //当前流水线
+
 var weekday = ["日", "一", "二", "三", "四", "五", "六"];
 var month = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
-var date_patt = /^[0-9]{4}-([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/;
+var days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+var date_patt = /^[0-9]{4}-([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/; //日期格式
 var start_date = new Date(2022, 5, 1);
 var end_date = new Date(2022, 5, 20);
-var date_num = 0;
-var order_num = 0;
+var date_num = 0; //日期数量
+var order_num = 0; //订单数量
 var cell_move_flag = true; //控制单元格是否移动
 var production_quantity = new Array();
-var max_production = new Array();
+var production_quantity_type = new Array();
+var max_production_quantity = new Array();
 var residual_production_quantity = new Array();
-var default_production = 2000;
+var default_production_quantity = 2000;
 
 // 流水表开始日期
 $("#startDate").blur(function() {
@@ -59,14 +63,21 @@ $("#startDate").keydown(function(event) {
     }
 })
 
+// 生成流水表
 $("#createScheduleListTable").click(function() {
     reloadTheSchedule();
 });
 
-$("#switchPipeline").click(function() {
+// 切换流水表
+$("#switchSchedule").click(function() {
     $(".scheduleList").toggle();
     current_schedule_index = 1 - current_schedule_index;
     reloadTheSchedule();
+})
+
+// 保存流水表
+$("#saveArrange").click(function() {
+    saveArrange();
 })
 
 // 初始化生产数量安排表、最大数量表、剩余数量表
@@ -85,17 +96,27 @@ function initSchedule() {
 
     for (let table_index = 0; table_index < $(".scheduleList").length; table_index++) {
         production_quantity[table_index] = new Array();
+        production_quantity_type[table_index] = new Array();
         for (let row = 0; row < order_num; row++) {
             production_quantity[table_index][row] = new Array();
+            production_quantity_type[table_index][row] = new Array();
             for (let col = 0; col < date_num; col++) {
                 production_quantity[table_index][row][col] = 0;
+                let day = new Date((start_date.getTime() + col * 24 * 3600 * 1e3)).getDay();
+                if (day == 0) {
+                    production_quantity_type[table_index][row][col] = "sundayCell";
+                } else if (day == 6) {
+                    production_quantity_type[table_index][row][col] = "saturdayCell";
+                } else {
+                    production_quantity_type[table_index][row][col] = "";
+                }
             }
         }
-        max_production[table_index] = new Array();
+        max_production_quantity[table_index] = new Array();
         residual_production_quantity[table_index] = new Array();
         for (let col = 0; col < date_num; col++) {
-            max_production[table_index][col] = default_production;
-            residual_production_quantity[table_index][col] = default_production;
+            max_production_quantity[table_index][col] = default_production_quantity;
+            residual_production_quantity[table_index][col] = default_production_quantity;
         }
     }
 }
@@ -114,7 +135,7 @@ function convertScheduleToProductionQuantity() {
         if (schedule[i].customerName == "最大生产数量") {
             let col_index = Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
             residual_production_quantity[schedule[i].lineNumber][col_index] = schedule[i].productionQuantity;
-            max_production[schedule[i].lineNumber][col_index] = schedule[i].productionQuantity;
+            max_production_quantity[schedule[i].lineNumber][col_index] = schedule[i].productionQuantity;
         }
     }
     for (let i in schedule) {
@@ -129,40 +150,50 @@ function convertScheduleToProductionQuantity() {
                 // console.log(row_index);
                 // console.log(col_index);
             production_quantity[schedule[i].lineNumber][row_index][col_index] = schedule[i].productionQuantity;
-            residual_production_quantity[schedule[i].lineNumber][col_index] -= schedule[i].productionQuantity;
-            orders[row_index].residual_quantity -= schedule[i].productionQuantity
+            production_quantity_type[schedule[i].lineNumber][row_index][col_index] = "manualCell";
+            if (schedule[i].productionQuantity != -1) {
+                residual_production_quantity[schedule[i].lineNumber][col_index] -= schedule[i].productionQuantity;
+                orders[row_index].residual_quantity -= schedule[i].productionQuantity
+            }
         }
     }
-    table_index = current_schedule_index;
-    for (let table_index = 0; table_index < 2; table_index++) {
-        for (let row_index in orders) {
-            if (orders[row_index].residual_quantity <= 0) {
-                continue;
-            }
-            if ((table_index == 0 && orders[row_index].plannedStartDate0 != null) || (table_index == 1 && orders[row_index].plannedStartDate1 != null)) {
-                let col_index
-                if (table_index == 0) {
-                    col_index = Math.ceil((orders[row_index].plannedStartDate0 - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
-                } else if (table_index == 1) {
-                    col_index = Math.ceil((orders[row_index].plannedStartDate1 - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
-                }
-                for (let cur = col_index; cur < date_num; cur++) {
-                    if (production_quantity[table_index][row_index][cur] == 0 && residual_production_quantity[table_index][cur] > 0) {
-                        if (orders[row_index].residual_quantity > residual_production_quantity[table_index][cur]) {
-                            production_quantity[table_index][row_index][cur] = residual_production_quantity[table_index][cur];
-                            orders[row_index].residual_quantity -= residual_production_quantity[table_index][cur];
-                            residual_production_quantity[table_index][cur] = 0;
-                        } else {
-                            production_quantity[table_index][row_index][cur] = orders[row_index].residual_quantity
-                            residual_production_quantity[table_index][cur] -= orders[row_index].residual_quantity;
-                            orders[row_index].residual_quantity = 0;
-                        }
-                    }
-                }
-            }
+    for (let row_index in orders) {
+        if (orders[row_index].residual_quantity <= 0) {
+            continue;
+        }
+        if (orders[row_index].plannedStartDate0 != null && orders[row_index].plannedStartDate1 == null) {
+            let col_index = Math.ceil((orders[row_index].plannedStartDate0 - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
+            orders[row_index].residual_quantity = automaticallyAllocate(0, row_index, col_index, orders[row_index].residual_quantity);
+        } else if (orders[row_index].plannedStartDate0 == null && orders[row_index].plannedStartDate1 != null) {
+            let col_index = Math.ceil((orders[row_index].plannedStartDate1 - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
+            orders[row_index].residual_quantity = automaticallyAllocate(1, row_index, col_index, orders[row_index].residual_quantity);
+        } else if (orders[row_index].plannedStartDate0 != null && orders[row_index].plannedStartDate1 != null) {
+            let col_index0 = Math.ceil((orders[row_index].plannedStartDate0 - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
+            let col_index1 = Math.ceil((orders[row_index].plannedStartDate1 - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
+            let quantity0 = Math.floor(orders[row_index].residual_quantity / 2);
+            let quantity1 = orders[row_index].residual_quantity - quantity0;
+            orders[row_index].residual_quantity = automaticallyAllocate(0, row_index, col_index0, quantity0) + automaticallyAllocate(1, row_index, col_index1, quantity1);
         }
     }
 }
+
+function automaticallyAllocate(table_index, row_index, col_index, quantity) {
+    for (let cur = col_index; cur < date_num; cur++) {
+        if (production_quantity[table_index][row_index][cur] == 0 && residual_production_quantity[table_index][cur] > 0) {
+            if (quantity > residual_production_quantity[table_index][cur]) {
+                production_quantity[table_index][row_index][cur] = residual_production_quantity[table_index][cur];
+                quantity -= residual_production_quantity[table_index][cur];
+                residual_production_quantity[table_index][cur] = 0;
+            } else {
+                production_quantity[table_index][row_index][cur] = quantity
+                residual_production_quantity[table_index][cur] -= quantity;
+                quantity = 0;
+            }
+        }
+    }
+    return quantity;
+}
+
 
 // 打印生产数量安排表
 function scheduleList(table_index) {
@@ -181,9 +212,9 @@ function scheduleList(table_index) {
     }
     str += `</tr>`;
     for (let row = 0; row < order_num; row++) {
-        str += `<tr>`;
+        str += `<tr row-index="` + row + `" table-index="` + table_index + `">`;
         for (let col = 0; col < date_num; col++) {
-            str += `<td row-index="` + row + `" col-index="` + col + `"  table-index="` + table_index + `">`;
+            str += `<td class="` + production_quantity_type[table_index][row][col] + `" row-index="` + row + `" col-index="` + col + `"  table-index="` + table_index + `">`;
             if (production_quantity[table_index][row][col] > 0) {
                 str += production_quantity[table_index][row][col]
             }
@@ -191,9 +222,9 @@ function scheduleList(table_index) {
         }
         str += `</tr>`;
     }
-    str += `<tr>`;
+    str += `<tr row-index="` + order_num + `">`;
     for (let col = 0; col < date_num; col++) {
-        str += `<td style = "height: 60px;" row-index="` + order_num + `" col-index="` + col + `"  table-index="` + table_index + `">` + max_production[table_index][col] + `</td>`
+        str += `<td style = "height: 60px;" row-index="` + order_num + `" col-index="` + col + `"  table-index="` + table_index + `">` + max_production_quantity[table_index][col] + `</td>`
     }
     str += `</tr>`;
     str += `<tr>`;
@@ -233,7 +264,7 @@ function reloadTheSchedule() {
 
 function showBlenderOrder(orders) {
     let str = "<tbody>"
-    str += `<tr row-index="0">
+    str += `<tr>
                 <th>单号</th>
                 <th>客户名称</th>
                 <th>计划开始日期</th>
@@ -243,7 +274,7 @@ function showBlenderOrder(orders) {
                 <th>剩余数量</th>
             </tr>`
     for (let order_idx in orders) {
-        str += `<tr>
+        str += `<tr row-index="` + order_idx + `">
                     <td row-index="` + order_idx + `" col-index="0">` + (orders[order_idx].orderId == null ? "" : orders[order_idx].orderId) + `</td>
                     <td row-index="` + order_idx + `" col-index="1">` + (orders[order_idx].customerName == null ? "" : orders[order_idx].customerName) + `</td>`;
 
@@ -264,7 +295,7 @@ function showBlenderOrder(orders) {
         }
         str += `</tr>`
     }
-    str += `<tr>
+    str += `<tr row-index="` + order_num + `">
                 <th colspan = "7">最大生产数量</th>
             </tr>`
     str += `<tr>
@@ -326,6 +357,8 @@ $(document).keydown(function(event) {
                 $(".selectedCell").removeClass("selectedCell");
                 // console.log(`td[row-index='` + row_index + `'][col-index='` + col_index + `']`);
                 $(`td[row-index='` + row_index + `'][col-index='` + col_index + `']:not([table-index])`).addClass("selectedCell");
+                $(".selectedRow").removeClass("selectedRow");
+                $(`tr[row-index='` + row_index + `']`).addClass("selectedRow");
             } else {
                 $("#orderInfo").text($(`#order_list table td[row-index=` + row_index + `][col-index=1]`).text() + ` ` + $(`#order_list table td[row-index=` + row_index + `][col-index=0]`).text());
                 // console.log(`#order_list table td[row-index=0][col-index=` + col_index + `]`);
@@ -367,12 +400,27 @@ $(document).keydown(function(event) {
                 }
                 $(".selectedCell").removeClass("selectedCell");
                 $(`td[row-index='` + row_index + `'][col-index='` + col_index + `'][table-index='` + table_index + `']`).addClass("selectedCell");
+                $(".selectedRow").removeClass("selectedRow");
+                $(`tr[row-index='` + row_index + `']`).addClass("selectedRow");
             } else {
                 $("#orderInfo").text($(`#order_list table td[row-index=` + row_index + `][col-index=1]`).text() + ` ` + $(`#order_list table td[row-index=` + row_index + `][col-index=0]`).text());
                 $("#productionQuantity").val("");
                 $("#addPlanModal").modal("show");
             }
         }
+    }
+    if (event.altKey && event.keyCode == 49) {
+        event.stopPropagation();
+        $(".scheduleList").hide();
+        $(".scheduleList:eq(0)").show();
+        current_schedule_index = 0;
+        reloadTheSchedule();
+    } else if (event.altKey && event.keyCode == 50) {
+        event.stopPropagation();
+        $(".scheduleList").hide();
+        $(".scheduleList:eq(1)").show();
+        current_schedule_index = 1;
+        reloadTheSchedule();
     }
     console.log("document listen keydown : " + event.keyCode);
 });
@@ -391,12 +439,16 @@ function scheduleCellClick(table) {
             // 如果两次点击的是同一个块，则取消选中样式
             if ($(".selectedCell").is($(this))) {
                 $(".selectedCell").removeClass("selectedCell");
+                $(".selectedRow").removeClass("selectedRow");
             } else { // 如果两次点击的是不同的块
                 $(".selectedCell").removeClass("selectedCell");
                 $(this).addClass("selectedCell");
+                $(".selectedRow").removeClass("selectedRow");
+                $(`tr[row-index='` + $(this).attr("row-index") + `']`).addClass("selectedRow");
             }
         } else if ($(".selectedCell").length == 0) {
             $(this).addClass("selectedCell");
+            $(`tr[row-index='` + $(this).attr("row-index") + `']`).addClass("selectedRow");
         }
     })
 }
@@ -544,11 +596,15 @@ function modifyCell() {
                     schedule[i].lineNumber == table_index) {
                     exist = true;
                     schedule[i].productionQuantity = new_value;
+                    if (new_value == 0) {
+                        schedule.pop(i);
+                        reloadTheSchedule();
+                        return;
+                    }
                     break;
                 }
-
             }
-            if (exist == false) {
+            if (exist == false && new_value != 0) {
                 schedule.push({
                     "orderId": orders[row_index].orderId,
                     "customerName": orders[row_index].customerName,
