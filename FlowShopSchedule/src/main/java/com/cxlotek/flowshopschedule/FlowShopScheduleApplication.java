@@ -14,4 +14,5 @@ public class FlowShopScheduleApplication {
         SpringApplication.run(FlowShopScheduleApplication.class, args);
     }
 
+    //    nohup java -jar FlowShopSchedule-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod > applog.log 2>&1 &
 }

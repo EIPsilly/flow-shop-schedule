@@ -45,7 +45,6 @@ public class ChooseFileController {
     @RequestMapping("/deleteFile")
     public int deleteOrderByFileNumber(String fileNumber){
         log.info("fileNumber：" + fileNumber);
-//        return 1;
         return chooseFileService.deleteByFileNumber(fileNumber);
     }
 }
