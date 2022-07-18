@@ -31,6 +31,10 @@ public class ArrangeProductionPlanService {
     public void updateScheduleByFileNumber(List<BlenderOrder> orders,List<Schedule> schedule,String fileNumber){
         schuduleDao.deleteByFileNumber(fileNumber);
         blenderOrderDao.deleteByFileNumber(fileNumber);
+//        int l = 0,r = 0;
+//        while (r < orders.size()){
+//            r = Math.max(r+500,orders.size());
+//        }
         blenderOrderDao.insertBatch(orders);
         schuduleDao.insertBatch(schedule);
     }

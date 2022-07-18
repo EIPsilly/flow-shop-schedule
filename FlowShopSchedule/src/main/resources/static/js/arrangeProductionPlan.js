@@ -128,11 +128,15 @@ function convertScheduleToProductionQuantity() {
     end_date = new Date($("#endDate").val());
     identity_to_row_index = new Map();
     for (let i in orders) {
-        identity_to_row_index.set(orders[i].orderId + orders[i].customerName, i);
+        identity_to_row_index.set(orders[i].orderId + orders[i].customerName + orders[i].productModel, i);
         orders[i].residual_quantity = orders[i].orderQuantity;
     }
-    for (let i in schedule) {
-        if (schedule[i].customerName == "最大生产数量") {
+    for (let i = 0; i < schedule.length; i++) {
+        if (schedule[i].productionQuantity == 0) {
+            console.log(schedule[i])
+            schedule.splice(i, 1);
+            i--;
+        } else if (schedule[i].customerName == "最大生产数量") {
             let col_index = Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
             residual_production_quantity[schedule[i].lineNumber][col_index] = schedule[i].productionQuantity;
             max_production_quantity[schedule[i].lineNumber][col_index] = schedule[i].productionQuantity;
@@ -141,14 +145,13 @@ function convertScheduleToProductionQuantity() {
     for (let i in schedule) {
         schedule[i].date = new Date(schedule[i].date)
         if (schedule[i].customerName != "最大生产数量") {
-            let row_index = identity_to_row_index.get(schedule[i].orderId + schedule[i].customerName)
+            let row_index = identity_to_row_index.get(schedule[i].orderId + schedule[i].customerName + schedule[i].productModel)
             let col_index = Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
-                // console.log("convertScheduleToProductionQuantity");
-                // console.log(i);
-                // console.log(schedule[i]);
-                // console.log(schedule[i].lineNumber);
-                // console.log(row_index);
-                // console.log(col_index);
+            console.log("convertScheduleToProductionQuantity");
+            console.log("i : ", i);
+            console.log("schedule[i] : ", schedule[i]);
+            console.log("row_index : ", row_index);
+            console.log("col_index : ", col_index);
             production_quantity[schedule[i].lineNumber][row_index][col_index] = schedule[i].productionQuantity;
             production_quantity_type[schedule[i].lineNumber][row_index][col_index] = "manualCell";
             if (schedule[i].productionQuantity != -1) {
@@ -498,125 +501,121 @@ $("#addPlanModalConfirmButton").click(function() {
 function modifyCell() {
     let old_value = $(".selectedCell").text();
     let new_value = $("#productionQuantity").val();
-    if (old_value != new_value) {
-        let row_index = parseInt($(".selectedCell").attr("row-index"));
-        let col_index = parseInt($(".selectedCell").attr("col-index"));
-        let table_index = parseInt($(".selectedCell").attr("table-index"));
-        if (table_index !== table_index) { //修改订单信息
-            if (col_index == 2) { // 如果修改了计划开始日期
-                console.log("修改了计划开始日期");
-                console.log(row_index);
-                let pattern = /^([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/
-                console.log(pattern.test(new_value));
-                if (current_schedule_index == 0) {
-                    if (pattern.test(new_value) == false) {
-                        orders[row_index].plannedStartDate0 = null;
-                    } else {
-                        orders[row_index].plannedStartDate0 = new Date(new_value);
-                        orders[row_index].plannedStartDate0.setFullYear(start_date.getFullYear());
-                    }
-                }
-                if (current_schedule_index == 1) {
-                    if (pattern.test(new_value) == false) {
-                        orders[row_index].plannedStartDate1 = null;
-                    } else {
-                        orders[row_index].plannedStartDate1 = new Date(new_value);
-                        orders[row_index].plannedStartDate1.setFullYear(start_date.getFullYear());
-                    }
-                }
-            } else if (col_index != 6) { //修改剩余数量则无效
-                switch (col_index) {
-                    case 0:
-                        orders[row_index].orderId = new_value;
-                        break;
-                    case 1:
-                        orders[row_index].customerName = new_value;
-                        break;
-                    case 3:
-                        orders[row_index].plannedEndDate = new Date(new_value);
-                        orders[row_index].plannedEndDate.setFullYear(start_date.getFullYear());
-                        break;
-                    case 4:
-                        orders[row_index].orderQuantity = parseInt(new_value);
-                        break;
-                    case 5:
-                        orders[row_index].productModel = new_value;
-                        break;
+    let row_index = parseInt($(".selectedCell").attr("row-index"));
+    let col_index = parseInt($(".selectedCell").attr("col-index"));
+    let table_index = parseInt($(".selectedCell").attr("table-index"));
+    if (table_index !== table_index) { //修改订单信息
+        if (col_index == 2) { // 如果修改了计划开始日期
+            console.log("修改了计划开始日期");
+            console.log(row_index);
+            let pattern = /^([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/
+            console.log(pattern.test(new_value));
+            if (current_schedule_index == 0) {
+                if (pattern.test(new_value) == false) {
+                    orders[row_index].plannedStartDate0 = null;
+                } else {
+                    orders[row_index].plannedStartDate0 = new Date(new_value);
+                    orders[row_index].plannedStartDate0.setFullYear(start_date.getFullYear());
                 }
             }
-            reloadTheSchedule();
-        }
-        // 如果修改了最大生产量
-        else if (row_index == order_num) {
-            console.log("修改了最大生产量");
-            new_value = parseInt(new_value)
-            if (new_value != new_value) {
-                alert("请输入正确数字")
-                return;
+            if (current_schedule_index == 1) {
+                if (pattern.test(new_value) == false) {
+                    orders[row_index].plannedStartDate1 = null;
+                } else {
+                    orders[row_index].plannedStartDate1 = new Date(new_value);
+                    orders[row_index].plannedStartDate1.setFullYear(start_date.getFullYear());
+                }
             }
-            let exist = false;
-            for (let i in schedule) {
-                if (schedule[i].orderId == null &&
-                    schedule[i].customerName == "最大生产数量" &&
-                    schedule[i].fileNumber == $("#currentFile").text() &&
-                    Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) == col_index &&
-                    schedule[i].lineNumber == table_index) {
-                    exist = true;
-                    schedule[i].productionQuantity = new_value;
+        } else if (col_index != 6) { //修改剩余数量则无效
+            switch (col_index) {
+                case 0:
+                    orders[row_index].orderId = new_value;
                     break;
-                }
-
-            }
-            if (exist == false) {
-                schedule.push({
-                    "orderId": null,
-                    "customerName": "最大生产数量",
-                    "fileNumber": $("#currentFile").text(),
-                    "date": new Date(start_date.getTime() + col_index * 24 * 3600 * 1e3),
-                    "productionQuantity": new_value,
-                    "lineNumber": table_index
-                })
-            }
-            reloadTheSchedule();
-        }
-        // 修改了订单某日生产数量
-        else if (table_index == table_index) {
-            console.log("修改了订单某日生产数量");
-            new_value = parseInt(new_value);
-            if (new_value != new_value) {
-                alert("请输入正确数字")
-                return;
-            }
-            let exist = false;
-            for (let i in schedule) {
-                if (schedule[i].orderId == orders[row_index].orderId &&
-                    schedule[i].customerName == orders[row_index].customerName &&
-                    schedule[i].fileNumber == $("#currentFile").text() &&
-                    Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) == col_index &&
-                    schedule[i].lineNumber == table_index) {
-                    exist = true;
-                    schedule[i].productionQuantity = new_value;
-                    if (new_value == 0) {
-                        schedule.pop(i);
-                        reloadTheSchedule();
-                        return;
-                    }
+                case 1:
+                    orders[row_index].customerName = new_value;
                     break;
-                }
+                case 3:
+                    orders[row_index].plannedEndDate = new Date(new_value);
+                    orders[row_index].plannedEndDate.setFullYear(start_date.getFullYear());
+                    break;
+                case 4:
+                    orders[row_index].orderQuantity = parseInt(new_value);
+                    break;
+                case 5:
+                    orders[row_index].productModel = new_value;
+                    break;
             }
-            if (exist == false && new_value != 0) {
-                schedule.push({
-                    "orderId": orders[row_index].orderId,
-                    "customerName": orders[row_index].customerName,
-                    "fileNumber": $("#currentFile").text(),
-                    "date": new Date(start_date.getTime() + col_index * 24 * 3600 * 1e3),
-                    "productionQuantity": new_value,
-                    "lineNumber": table_index
-                })
-            }
-            reloadTheSchedule();
+        }
+        reloadTheSchedule();
+    }
+    // 如果修改了最大生产量
+    else if (row_index == order_num) {
+        console.log("修改了最大生产量");
+        new_value = parseInt(new_value)
+        if (new_value != new_value) {
+            alert("请输入正确数字")
             return;
         }
+        let exist = false;
+        for (let i in schedule) {
+            if (schedule[i].orderId == null &&
+                schedule[i].customerName == "最大生产数量" &&
+                schedule[i].fileNumber == $("#currentFile").text() &&
+                Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) == col_index &&
+                schedule[i].lineNumber == table_index) {
+                exist = true;
+                schedule[i].productionQuantity = new_value;
+                break;
+            }
+
+        }
+        if (exist == false) {
+            schedule.push({
+                "orderId": null,
+                "customerName": "最大生产数量",
+                "fileNumber": $("#currentFile").text(),
+                "date": new Date(start_date.getTime() + col_index * 24 * 3600 * 1e3),
+                "productionQuantity": new_value,
+                "lineNumber": table_index,
+                "productModel": null
+            })
+        }
+        reloadTheSchedule();
+    }
+    // 修改了订单某日生产数量
+    else if (table_index == table_index) {
+        console.log("修改了订单某日生产数量");
+        new_value = parseInt(new_value);
+        if (new_value != new_value) {
+            alert("请输入正确数字")
+            return;
+        }
+        let exist = false;
+        for (let i in schedule) {
+            if (schedule[i].orderId == orders[row_index].orderId &&
+                schedule[i].customerName == orders[row_index].customerName &&
+                schedule[i].productModel == orders[row_index].productModel &&
+                schedule[i].fileNumber == $("#currentFile").text() &&
+                Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) == col_index &&
+                schedule[i].lineNumber == table_index) {
+                exist = true;
+                schedule[i].productionQuantity = new_value;
+                break;
+            }
+        }
+        if (exist == false && new_value != 0) {
+            schedule.push({
+                "orderId": orders[row_index].orderId,
+                "customerName": orders[row_index].customerName,
+                "fileNumber": $("#currentFile").text(),
+                "date": new Date(start_date.getTime() + col_index * 24 * 3600 * 1e3),
+                "productionQuantity": new_value,
+                "lineNumber": table_index,
+                "productModel": orders[row_index].productModel
+            })
+        }
+        reloadTheSchedule();
+        return;
     }
     cell_move_flag = true;
 }
@@ -627,3 +626,4 @@ function modifyCell() {
 // date    日期
 // production_quantity 生产数量
 // line_number 流水线序号
+// product_model   产品型号 productModel

@@ -40,6 +40,7 @@ public class ArrangeProductionPlanController {
         List<Schedule> schedule = JSON.parseArray(JSON.toJSONString(params.get("schedule")),Schedule.class);
         String fileNumber = (String)params.get("fileNumber");
         log.info("saveArrange()\tfileNumber:" + fileNumber);
+        log.info("orders.size() : " + orders.size() + "\tschedule.size() : " + schedule.size());
         arrangeProductionPlanService.updateScheduleByFileNumber(orders,schedule,fileNumber);
         return "success";
     }
