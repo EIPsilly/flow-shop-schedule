@@ -53,6 +53,9 @@
 #arrangeProductionPlan #temporalInterval #endDateInputMessage {
   color: red;
 }
+#arrangeProductionPlan #defaultProductionQuantity {
+  width: 100px;
+}
 #arrangeProductionPlan th,
 #arrangeProductionPlan td {
   text-align: center;

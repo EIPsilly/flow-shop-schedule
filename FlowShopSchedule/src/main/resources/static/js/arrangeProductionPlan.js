@@ -25,7 +25,7 @@ var production_quantity = new Array();
 var production_quantity_type = new Array();
 var max_production_quantity = new Array();
 var residual_production_quantity = new Array();
-var default_production_quantity = 2000;
+var default_production_quantity = new Array();
 
 // 流水表开始日期
 $("#startDate").blur(function() {
@@ -94,6 +94,13 @@ function initSchedule() {
     end_date = new Date($("#endDate").val());
     date_num = Math.ceil((end_date - start_date) / 3600 / 1000 / 24) + 1;
 
+    default_production_quantity = [2000, 2000];
+    for (let i = 0; i < schedule.length; i++) {
+        if (schedule[i].customerName == "默认最大生产数量") {
+            default_production_quantity[schedule[i].lineNumber] = schedule[i].productionQuantity;
+        }
+    }
+
     for (let table_index = 0; table_index < $(".scheduleList").length; table_index++) {
         production_quantity[table_index] = new Array();
         production_quantity_type[table_index] = new Array();
@@ -115,8 +122,8 @@ function initSchedule() {
         max_production_quantity[table_index] = new Array();
         residual_production_quantity[table_index] = new Array();
         for (let col = 0; col < date_num; col++) {
-            max_production_quantity[table_index][col] = default_production_quantity;
-            residual_production_quantity[table_index][col] = default_production_quantity;
+            max_production_quantity[table_index][col] = default_production_quantity[table_index];
+            residual_production_quantity[table_index][col] = default_production_quantity[table_index];
         }
     }
 }
@@ -144,7 +151,7 @@ function convertScheduleToProductionQuantity() {
     }
     for (let i in schedule) {
         schedule[i].date = new Date(schedule[i].date)
-        if (schedule[i].customerName != "最大生产数量") {
+        if ((schedule[i].customerName != "最大生产数量") && (schedule[i].customerName != "默认最大生产数量")) {
             let row_index = identity_to_row_index.get(schedule[i].orderId + schedule[i].customerName + schedule[i].productModel)
             let col_index = Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
             console.log("convertScheduleToProductionQuantity");
@@ -180,6 +187,7 @@ function convertScheduleToProductionQuantity() {
     }
 }
 
+// 自动安排订单
 function automaticallyAllocate(table_index, row_index, col_index, quantity) {
     for (let cur = col_index; cur < date_num; cur++) {
         if (production_quantity[table_index][row_index][cur] == 0 && residual_production_quantity[table_index][cur] > 0) {
@@ -243,28 +251,7 @@ function scheduleList(table_index) {
     table.html(str);
 }
 
-function reloadTheSchedule() {
-    let row_index, col_index, table_index, have_selected_cell = false;
-    if ($(".selectedCell").length == 1) {
-        row_index = parseInt($(".selectedCell").attr("row-index"));
-        col_index = parseInt($(".selectedCell").attr("col-index"));
-        table_index = parseInt($(".selectedCell").attr("table-index"));
-        have_selected_cell = true;
-    }
-    initSchedule();
-    convertScheduleToProductionQuantity();
-    scheduleList(0);
-    scheduleList(1);
-    showBlenderOrder(orders);
-    if (have_selected_cell) {
-        if (table_index !== table_index) {
-            $(`td[row-index='` + row_index + `'][col-index='` + col_index + `']:not([table-index])`).addClass("selectedCell");
-        } else {
-            $(`td[row-index='` + row_index + `'][col-index='` + col_index + `'][table-index='` + table_index + `']`).addClass("selectedCell");
-        }
-    }
-}
-
+// 打印所有订单
 function showBlenderOrder(orders) {
     let str = "<tbody>"
     str += `<tr>
@@ -299,7 +286,7 @@ function showBlenderOrder(orders) {
         str += `</tr>`
     }
     str += `<tr row-index="` + order_num + `">
-                <th colspan = "7">最大生产数量</th>
+                <th colspan = "7">默认最大生产数量：<input type = "text" id = "defaultProductionQuantity" value = "` + default_production_quantity[current_schedule_index] + `"></th>
             </tr>`
     str += `<tr>
                 <th colspan = "7">剩余可安排生产数量</th>
@@ -320,6 +307,63 @@ function showBlenderOrder(orders) {
 // comment 备注 comment
 // file_number 所属文件 fileNumber
 
+
+function addTableEvent() {
+    // 修改默认最大生产数量
+    $("#defaultProductionQuantity").keydown(function(event) {
+        event.stopPropagation();
+        console.log("defaultProductionQuantity.keydown");
+        if (event.keyCode == 13) {
+            default_production_quantity[current_schedule_index] = parseInt($("#defaultProductionQuantity").val());
+            let exist = false;
+            for (let i in schedule) {
+                if (schedule[i].customerName == "默认最大生产数量" &&
+                    schedule[i].fileNumber == $("#currentFile").text() &&
+                    schedule[i].lineNumber == current_schedule_index) {
+                    exist = true;
+                    schedule[i].productionQuantity = default_production_quantity[current_schedule_index];
+                    break;
+                }
+            }
+            if (exist == false) {
+                schedule.push({
+                    "orderId": null,
+                    "customerName": "默认最大生产数量",
+                    "fileNumber": $("#currentFile").text(),
+                    "date": null,
+                    "productionQuantity": default_production_quantity[current_schedule_index],
+                    "lineNumber": current_schedule_index,
+                    "productModel": null
+                })
+
+            }
+            reloadTheSchedule();
+        }
+    })
+}
+
+function reloadTheSchedule() {
+    let row_index, col_index, table_index, have_selected_cell = false;
+    if ($(".selectedCell").length == 1) {
+        row_index = parseInt($(".selectedCell").attr("row-index"));
+        col_index = parseInt($(".selectedCell").attr("col-index"));
+        table_index = parseInt($(".selectedCell").attr("table-index"));
+        have_selected_cell = true;
+    }
+    initSchedule();
+    convertScheduleToProductionQuantity();
+    scheduleList(0);
+    scheduleList(1);
+    showBlenderOrder(orders);
+    addTableEvent();
+    if (have_selected_cell) {
+        if (table_index !== table_index) {
+            $(`td[row-index='` + row_index + `'][col-index='` + col_index + `']:not([table-index])`).addClass("selectedCell");
+        } else {
+            $(`td[row-index='` + row_index + `'][col-index='` + col_index + `'][table-index='` + table_index + `']`).addClass("selectedCell");
+        }
+    }
+}
 
 // 上下选择单元格
 $(document).keydown(function(event) {

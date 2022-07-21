@@ -36,6 +36,8 @@ public class ArrangeProductionPlanService {
 //            r = Math.max(r+500,orders.size());
 //        }
         blenderOrderDao.insertBatch(orders);
-        schuduleDao.insertBatch(schedule);
+        if (schedule.size() > 0) {
+            schuduleDao.insertBatch(schedule);
+        }
     }
 }

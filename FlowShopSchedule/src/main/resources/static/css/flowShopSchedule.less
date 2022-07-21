@@ -1,5 +1,6 @@
 ::-webkit-scrollbar {
-    display: none; /* Chrome Safari */
+    display: none;
+    /* Chrome Safari */
 }
 
 #myBar {
@@ -49,28 +50,33 @@
 // 流水安排页面
 #arrangeProductionPlan {
 
-    #temporalInterval{
+    #temporalInterval {
         display: flex;
         align-items: center;
         margin-top: 15px;
-        
-        .form-group{
+
+        .form-group {
             display: flex;
             flex-direction: column;
             margin: 0px 30px;
-            label{
+
+            label {
                 font-weight: 600;
             }
-        }        
+        }
 
         #startDateInputMessage,
-        #endDateInputMessage{
+        #endDateInputMessage {
             color: red;
         }
 
         // #createScheduleListTable{
         //     height: 10%;
         // }
+    }
+
+    #defaultProductionQuantity {
+        width: 100px;
     }
 
     th,
@@ -82,23 +88,23 @@
         height: 43px;
     }
 
-    th{
+    th {
         height: 60px;
     }
 
-    .scheduleListTitle{
+    .scheduleListTitle {
         text-align: center;
         font-size: 20px;
         font-weight: 800;
     }
 
-    #arrangeArea{
+    #arrangeArea {
         display: flex;
 
         #order_list {
             flex: 3;
 
-            td{
+            td {
                 overflow-x: auto;
                 max-width: 300px;
             }
@@ -106,36 +112,39 @@
 
         .scheduleList {
             flex: 7;
-            overflow-x:auto;
+            overflow-x: auto;
         }
     }
 
 
-    .selectedRow{
+    .selectedRow {
         background-color: #00000030;
     }
-    .selectedCell{
+
+    .selectedCell {
         border: 2px solid black;
         // padding: 7px;
     }
 
-    .errorCell{
+    .errorCell {
         font-weight: 800;
         color: red;
     }
 
-    .sundayCell{
+    .sundayCell {
         background-color: #d6454550;
     }
-    .saturdayCell{
+
+    .saturdayCell {
         background-color: #62a1e050;
     }
-    .manualCell{
+
+    .manualCell {
         background-color: #24c23f50;
     }
 }
 
-#orderInfo{
+#orderInfo {
     font-weight: 600;
 }
 

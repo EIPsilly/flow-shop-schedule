@@ -116,7 +116,7 @@ function getFileList() {
             console.log(fileNameList);
             listAllFileName(fileNameList);
         },
-        error: function(res) {
+        error: function(error) {
             console.log(error);
             alert("获取文件名错误，请联系管理员");
         }
