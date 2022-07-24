@@ -2,7 +2,9 @@
     display: none;
     /* Chrome Safari */
 }
-
+p{
+    margin: 0;
+}
 #myBar {
     display: flex;
     justify-content: space-between;
@@ -93,6 +95,7 @@
     }
 
     .scheduleListTitle {
+        margin-bottom: 16px;
         text-align: center;
         font-size: 20px;
         font-weight: 800;
@@ -141,6 +144,15 @@
 
     .manualCell {
         background-color: #24c23f50;
+    }
+}
+
+// 订单右键菜单
+#orderContextMenu{
+    display: none;
+    position: absolute;
+    li:hover{
+        background-color: #007BFF;
     }
 }
 

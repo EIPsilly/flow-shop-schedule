@@ -64,7 +64,10 @@
                 </div>
                 <div id="arrangeArea">
                     <div id="order_list">
-                        <p class="scheduleListTitle">订单列表</p>
+                        <div style="display: flex; justify-content:center; align-items: center; margin-bottom: 16px;">
+                            <p class="scheduleListTitle" style="margin: 0px 5px 0px 0px;">订单列表</p>
+                            <svg id="addOrder" viewBox="0 0 1024 1024" width="18" height="18"><path d="M864 0H160C70.4 0 0 70.4 0 160v704c0 89.6 70.4 160 160 160h704c89.6 0 160-70.4 160-160V160c0-89.6-70.4-160-160-160z m96 864c0 54.4-41.6 96-96 96H160c-54.4 0-96-41.6-96-96V160c0-54.4 41.6-96 96-96h704c54.4 0 96 41.6 96 96v704z" p-id="2276"></path><path d="M768 480h-224V256c0-19.2-12.8-32-32-32s-32 12.8-32 32v224H256c-19.2 0-32 12.8-32 32s12.8 32 32 32h224v224c0 19.2 12.8 32 32 32s32-12.8 32-32v-224h224c19.2 0 32-12.8 32-32s-12.8-32-32-32z" p-id="2277"></path></svg>
+                        </div>
                         <table class="table table-bordered table-striped table-hover">
                         </table>
                     </div>
@@ -122,30 +125,6 @@
             </div>
         </div>
     </div>
-    <!--删除文件模态框 -->
-    <div class="modal fade" id="deleteFile">
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <!-- 模态框头部 -->
-                <div class="modal-header">
-                    <h4 class="modal-title">模态框头部</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-
-                <!-- 模态框主体 -->
-                <div class="modal-body">
-                    模态框内容..
-                </div>
-
-                <!-- 模态框底部 -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-                </div>
-
-            </div>
-        </div>
-    </div>
 
     <!-- 添加安排模态框 -->
     <div class="modal" id="addPlanModal">
@@ -179,6 +158,10 @@
             </div>
         </div>
     </div>
+
+    <ul class="list-group" id="orderContextMenu">
+        <li class="list-group-item">删除</li>
+    </ul>
 
     <script src="./js/flowShopSchedule.js"></script>
     <script src="./js/flowShopScheduleData.js"></script>

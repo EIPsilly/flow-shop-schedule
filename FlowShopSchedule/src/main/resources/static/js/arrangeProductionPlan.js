@@ -255,8 +255,8 @@ function scheduleList(table_index) {
 function showBlenderOrder(orders) {
     let str = "<tbody>"
     str += `<tr>
-                <th>单号</th>
                 <th>客户名称</th>
+                <th>单号</th>
                 <th>计划开始日期</th>
                 <th>计划结束日期</th>
                 <th>订单数量</th>
@@ -265,8 +265,8 @@ function showBlenderOrder(orders) {
             </tr>`
     for (let order_idx in orders) {
         str += `<tr row-index="` + order_idx + `">
-                    <td row-index="` + order_idx + `" col-index="0">` + (orders[order_idx].orderId == null ? "" : orders[order_idx].orderId) + `</td>
-                    <td row-index="` + order_idx + `" col-index="1">` + (orders[order_idx].customerName == null ? "" : orders[order_idx].customerName) + `</td>`;
+                    <td row-index="` + order_idx + `" col-index="0">` + (orders[order_idx].customerName == null ? "" : orders[order_idx].customerName) + `</td>
+                    <td row-index="` + order_idx + `" col-index="1">` + (orders[order_idx].orderId == null ? "" : orders[order_idx].orderId) + `</td>`;
 
         if (current_schedule_index == 0) {
             str += `<td row-index="` + order_idx + `" col-index="2">` + (orders[order_idx].plannedStartDate0 == null ? "" : orders[order_idx].plannedStartDate0.getMonth() + 1 + "-" + orders[order_idx].plannedStartDate0.getDate()) + `</td>`;
@@ -295,8 +295,8 @@ function showBlenderOrder(orders) {
     $("#order_list table").html(str)
 }
 
-// order_id    单号 orderId
 // customer_name   客户名称 customerName
+// order_id    单号 orderId
 // planned_start_date0  流水线一计划开始日期 plannedStartDate0
 // planned_start_date1  流水线二计划开始日期 plannedStartDate1
 // planned_end_date    计划结束日期 plannedEndDate
@@ -480,8 +480,7 @@ function scheduleCellClick(table) {
             return;
         }
         console.log("点击td");
-        console.log($(this));
-        console.log($(this).html());
+        $("#orderContextMenu").hide();
         if ($(".selectedCell").length == 1) {
             // 如果两次点击的是同一个块，则取消选中样式
             if ($(".selectedCell").is($(this))) {
@@ -505,6 +504,7 @@ scheduleCellClick("#scheduleList1");
 
 $(document).click(function() {
     console.log("点击document");
+    $("#orderContextMenu").hide();
     $(".selectedCell").removeClass("selectedCell");
 })
 
@@ -573,10 +573,10 @@ function modifyCell() {
         } else if (col_index != 6) { //修改剩余数量则无效
             switch (col_index) {
                 case 0:
-                    orders[row_index].orderId = new_value;
+                    orders[row_index].customerName = new_value;
                     break;
                 case 1:
-                    orders[row_index].customerName = new_value;
+                    orders[row_index].orderId = new_value;
                     break;
                 case 3:
                     orders[row_index].plannedEndDate = new Date(new_value);
@@ -671,3 +671,51 @@ function modifyCell() {
 // production_quantity 生产数量
 // line_number 流水线序号
 // product_model   产品型号 productModel
+
+// 删除订单
+$("#order_list").on("contextmenu", "table td", function() {
+    return false;
+})
+
+$("#order_list").on("mousedown", "table td", function(event) {
+    event.stopPropagation();
+    console.log("event.which = ", event.which);
+    $("#orderContextMenu").hide();
+    if (event.which == 3 && $(this)[0] == $(".selectedCell")[0]) {
+        $("#orderContextMenu").show();
+        let x = event.clientX;
+        let y = event.clientY;
+        $("#orderContextMenu").css("top", y);
+        $("#orderContextMenu").css("left", x);
+        console.log("x=", x, "y=", y);
+    }
+})
+
+$("#orderContextMenu").on("click", "li", function(event) {
+    event.stopPropagation();
+    console.log("点击右键菜单选项");
+    $("#orderContextMenu").hide();
+    if ($(this).text() == "删除") {
+        let idx = $(".selectedCell").attr("row-index")
+        orders.splice(idx, 1);
+        reloadTheSchedule();
+    }
+})
+
+// 添加订单
+$("#addOrder").click(function() {
+    orders.push({
+        "orderId": null,
+        "customerName": null,
+        "plannedStartDate0": null,
+        "plannedStartDate1": null,
+        "plannedEndDate": null,
+        "startDate": null,
+        "orderQuantity": null,
+        "productModel": null,
+        "merchandiser": null,
+        "comment": null,
+        "fileNumber": $("#currentFile").text()
+    });
+    reloadTheSchedule();
+})
