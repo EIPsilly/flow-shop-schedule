@@ -234,6 +234,9 @@ function scheduleList(table_index) {
         }
         str += `</tr>`;
     }
+    str += `</tbody>`;
+    // 打印默认最大生产数量
+    str += "<tfoot>";
     str += `<tr row-index="` + order_num + `">`;
     for (let col = 0; col < date_num; col++) {
         str += `<td style = "height: 60px;" row-index="` + order_num + `" col-index="` + col + `"  table-index="` + table_index + `">` + max_production_quantity[table_index][col] + `</td>`
@@ -248,7 +251,7 @@ function scheduleList(table_index) {
         }
     }
     str += `</tr>`;
-    str += `</tbody>`;
+    str += "</tfoot>";
     table.html(str);
 }
 
@@ -288,13 +291,15 @@ function showBlenderOrder(orders) {
         }
         str += `</tr>`
     }
+    str += "</tbody>";
+    str += "<tfoot>";
     str += `<tr row-index="` + order_num + `">
                 <th colspan = "7">默认最大生产数量：<input type = "text" id = "defaultProductionQuantity" value = "` + default_production_quantity[current_schedule_index] + `"></th>
             </tr>`
     str += `<tr>
                 <th colspan = "7">剩余可安排生产数量</th>
             </tr>`
-    str += "</tbody>"
+    str += "</tfoot>";
     $("#order_list table").html(str)
 }
 
