@@ -354,9 +354,6 @@ function addTableEvent() {
     addSynchronousScrolling = function(dom) {
         dom.mouseover(function() {
             $(this).on("scroll", function() {
-                console.log(1);
-                console.log($(this).scrollTop());
-                console.log($(this).scrollLeft());
                 for (idx in synchronous_scrolling_tables) {
                     synchronous_scrolling_tables[idx].scrollTop($(this).scrollTop()); // 纵向滚动条
                     synchronous_scrolling_tables[idx].scrollLeft($(this).scrollLeft()); // 横向滚动条
@@ -503,7 +500,7 @@ $(document).keydown(function(event) {
 
 //  单元格点击事件
 function scheduleCellClick(table) {
-    $(table).on("click", "tbody td", function(event) {
+    $(table).on("click", "td", function(event) {
         event.stopPropagation();
         if ($(this).attr("row-index") == undefined) {
             return;
