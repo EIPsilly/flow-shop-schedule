@@ -324,13 +324,17 @@ function addTableEvent() {
         if (event.keyCode == 13) {
             default_production_quantity[current_schedule_index] = parseInt($("#defaultProductionQuantity").val());
             let exist = false;
-            for (let i in schedule) {
-                if (schedule[i].customerName == "默认最大生产数量" &&
+            for (let i = 0; i < schedule.length; i++) {
+                if (schedule[i].customerName == "最大生产数量" &&
                     schedule[i].fileNumber == $("#currentFile").text() &&
                     schedule[i].lineNumber == current_schedule_index) {
-                    exist = true;
+                    schedule.splice(i, 1);
+                    i--;
+                } else if (schedule[i].customerName == "默认最大生产数量" &&
+                    schedule[i].fileNumber == $("#currentFile").text() &&
+                    schedule[i].lineNumber == current_schedule_index) {
                     schedule[i].productionQuantity = default_production_quantity[current_schedule_index];
-                    break;
+                    exist = true;
                 }
             }
             if (exist == false) {
