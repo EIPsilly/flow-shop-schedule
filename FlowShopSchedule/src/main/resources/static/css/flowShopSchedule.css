@@ -59,6 +59,37 @@ p {
 #arrangeProductionPlan #defaultProductionQuantity {
   width: 100px;
 }
+#arrangeProductionPlan tbody {
+  height: calc(100vh - 298px);
+  overflow: auto;
+  display: block;
+}
+#arrangeProductionPlan tr {
+  table-layout: fixed;
+  display: table;
+  width: 100%;
+}
+#arrangeProductionPlan .orderColumn0 {
+  width: 121px;
+}
+#arrangeProductionPlan .orderColumn1 {
+  width: 40px;
+}
+#arrangeProductionPlan .orderColumn2 {
+  width: 110px;
+}
+#arrangeProductionPlan .orderColumn3 {
+  width: 110px;
+}
+#arrangeProductionPlan .orderColumn4 {
+  width: 80px;
+}
+#arrangeProductionPlan .orderColumn5 {
+  width: 243px;
+}
+#arrangeProductionPlan .orderColumn6 {
+  width: 80px;
+}
 #arrangeProductionPlan th,
 #arrangeProductionPlan td {
   text-align: center;
@@ -89,6 +120,9 @@ p {
 #arrangeProductionPlan #arrangeArea .scheduleList {
   flex: 7;
   overflow-x: auto;
+}
+#arrangeProductionPlan #arrangeArea .scheduleList td {
+  width: 50px;
 }
 #arrangeProductionPlan .selectedRow {
   background-color: #00000030;

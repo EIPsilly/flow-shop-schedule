@@ -2,6 +2,7 @@
     display: none;
     /* Chrome Safari */
 }
+
 p{
     margin: 0;
 }
@@ -81,6 +82,40 @@ p{
         width: 100px;
     }
 
+    tbody{
+        height:calc(100vh - 298px);
+        overflow: auto;
+        display: block;
+    }
+
+    tr{
+        table-layout: fixed;
+        display: table;
+        width: 100%;
+    }
+
+    .orderColumn0{
+        width: 121px;
+    }
+    .orderColumn1{
+        width: 40px;
+    }
+    .orderColumn2{
+        width: 110px;
+    }
+    .orderColumn3{
+        width: 110px;
+    }
+    .orderColumn4{
+        width: 80px;
+    }
+    .orderColumn5{
+        width: 243px;
+    }
+    .orderColumn6{
+        width: 80px;
+    }
+
     th,
     td {
         text-align: center;
@@ -116,6 +151,9 @@ p{
         .scheduleList {
             flex: 7;
             overflow-x: auto;
+            td{
+                width: 50px;
+            }
         }
     }
 

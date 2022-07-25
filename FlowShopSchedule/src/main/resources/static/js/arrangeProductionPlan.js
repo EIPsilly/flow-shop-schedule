@@ -15,7 +15,7 @@ var orders, //订单列表
 var weekday = ["日", "一", "二", "三", "四", "五", "六"];
 var month = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
 var days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-var date_patt = /^[0-9]{4}-([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/; //日期格式
+var date_patt = /^[0-9]{4}-([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[12][0-9]|3[01])$/; //日期格式
 var start_date = new Date(2022, 5, 1);
 var end_date = new Date(2022, 5, 20);
 var date_num = 0; //日期数量
@@ -26,6 +26,7 @@ var production_quantity_type = new Array();
 var max_production_quantity = new Array();
 var residual_production_quantity = new Array();
 var default_production_quantity = new Array();
+var synchronous_scrolling_tables = new Array();
 
 // 流水表开始日期
 $("#startDate").blur(function() {
@@ -213,7 +214,7 @@ function scheduleList(table_index) {
     date_num = Math.ceil((end_date - start_date) / 3600 / 1000 / 24) + 1;
 
     table = $("#scheduleList" + table_index + " table")
-    let str = `<tbody><tr>\n`,
+    let str = `<thead><tr>\n`,
         col_idx = 0;
     for (let now = deepCopy(start_date); now <= end_date; now.setDate(now.getDate() + 1)) {
         let month = now.getMonth();
@@ -221,7 +222,7 @@ function scheduleList(table_index) {
         let day = now.getDay();
         str += `<th>` + (month + 1) + `-` + date + `<br/>` + weekday[day] + `</th>`;
     }
-    str += `</tr>`;
+    str += `</tr></thead><tbody>`;
     for (let row = 0; row < order_num; row++) {
         str += `<tr row-index="` + row + `" table-index="` + table_index + `">`;
         for (let col = 0; col < date_num; col++) {
@@ -253,35 +254,37 @@ function scheduleList(table_index) {
 
 // 打印所有订单
 function showBlenderOrder(orders) {
-    let str = "<tbody>"
-    str += `<tr>
-                <th>客户名称</th>
-                <th>单号</th>
-                <th>计划开始日期</th>
-                <th>计划结束日期</th>
-                <th>订单数量</th>
-                <th>产品型号</th>
-                <th>剩余数量</th>
-            </tr>`
+    let str = `<thead>
+                    <tr class = "talbeTitle">
+                        <th class = "orderColumn0">客户名称</th>
+                        <th class = "orderColumn1">单号</th>
+                        <th class = "orderColumn2">计划开始日期</th>
+                        <th class = "orderColumn3">计划结束日期</th>
+                        <th class = "orderColumn4">订单数量</th>
+                        <th class = "orderColumn5">产品型号</th>
+                        <th class = "orderColumn6">剩余数量</th>
+                    </tr>
+                </thead>
+                <tbody>`;
     for (let order_idx in orders) {
         str += `<tr row-index="` + order_idx + `">
-                    <td row-index="` + order_idx + `" col-index="0">` + (orders[order_idx].customerName == null ? "" : orders[order_idx].customerName) + `</td>
-                    <td row-index="` + order_idx + `" col-index="1">` + (orders[order_idx].orderId == null ? "" : orders[order_idx].orderId) + `</td>`;
+                    <td class = "orderColumn0" row-index="` + order_idx + `" col-index="0">` + (orders[order_idx].customerName == null ? "" : orders[order_idx].customerName) + `</td>
+                    <td class = "orderColumn1" row-index="` + order_idx + `" col-index="1">` + (orders[order_idx].orderId == null ? "" : orders[order_idx].orderId) + `</td>`;
 
         if (current_schedule_index == 0) {
-            str += `<td row-index="` + order_idx + `" col-index="2">` + (orders[order_idx].plannedStartDate0 == null ? "" : orders[order_idx].plannedStartDate0.getMonth() + 1 + "-" + orders[order_idx].plannedStartDate0.getDate()) + `</td>`;
+            str += `<td class = "orderColumn2" row-index="` + order_idx + `" col-index="2">` + (orders[order_idx].plannedStartDate0 == null ? "" : orders[order_idx].plannedStartDate0.getMonth() + 1 + "-" + orders[order_idx].plannedStartDate0.getDate()) + `</td>`;
         } else {
-            str += `<td row-index="` + order_idx + `" col-index="2">` + (orders[order_idx].plannedStartDate1 == null ? "" : orders[order_idx].plannedStartDate1.getMonth() + 1 + "-" + orders[order_idx].plannedStartDate1.getDate()) + `</td>`;
+            str += `<td class = "orderColumn2" row-index="` + order_idx + `" col-index="2">` + (orders[order_idx].plannedStartDate1 == null ? "" : orders[order_idx].plannedStartDate1.getMonth() + 1 + "-" + orders[order_idx].plannedStartDate1.getDate()) + `</td>`;
         }
 
-        str += `<td row-index="` + order_idx + `" col-index="3">` + (orders[order_idx].plannedEndDate == null ? "" : orders[order_idx].plannedEndDate.getMonth() + 1 + "-" + orders[order_idx].plannedEndDate.getDate()) + `</td>
-                    <td row-index="` + order_idx + `" col-index="4">` + (orders[order_idx].orderQuantity == null ? "" : orders[order_idx].orderQuantity) + `</td>
-                    <td row-index="` + order_idx + `" col-index="5">` + (orders[order_idx].productModel == null ? "" : orders[order_idx].productModel) + `</td>`;
+        str += `<td class = "orderColumn3" row-index="` + order_idx + `" col-index="3">` + (orders[order_idx].plannedEndDate == null ? "" : orders[order_idx].plannedEndDate.getMonth() + 1 + "-" + orders[order_idx].plannedEndDate.getDate()) + `</td>
+                    <td class = "orderColumn4" row-index="` + order_idx + `" col-index="4">` + (orders[order_idx].orderQuantity == null ? "" : orders[order_idx].orderQuantity) + `</td>
+                    <td class = "orderColumn5" row-index="` + order_idx + `" col-index="5">` + (orders[order_idx].productModel == null ? "" : orders[order_idx].productModel) + `</td>`;
 
         if (orders[order_idx].residual_quantity >= 0) {
-            str += `<td row-index="` + order_idx + `" col-index="6">` + orders[order_idx].residual_quantity + `</td>`
+            str += `<td class = "orderColumn6" row-index="` + order_idx + `" col-index="6">` + orders[order_idx].residual_quantity + `</td>`
         } else {
-            str += `<td class = "errorCell" row-index="` + order_idx + `" col-index="6">` + orders[order_idx].residual_quantity + `</td>`
+            str += `<td class = "orderColumn6 errorCell" row-index="` + order_idx + `" col-index="6">` + orders[order_idx].residual_quantity + `</td>`
         }
         str += `</tr>`
     }
@@ -340,6 +343,27 @@ function addTableEvent() {
             reloadTheSchedule();
         }
     })
+
+    // 添加滚动同步
+    synchronous_scrolling_tables = [$("#order_list table tbody"), $("#scheduleList0 table tbody"), $("#scheduleList1 table tbody")];
+    addSynchronousScrolling = function(dom) {
+        dom.mouseover(function() {
+            $(this).on("scroll", function() {
+                console.log(1);
+                console.log($(this).scrollTop());
+                console.log($(this).scrollLeft());
+                for (idx in synchronous_scrolling_tables) {
+                    synchronous_scrolling_tables[idx].scrollTop($(this).scrollTop()); // 纵向滚动条
+                    synchronous_scrolling_tables[idx].scrollLeft($(this).scrollLeft()); // 横向滚动条
+                }
+            });
+        }).mouseout(function() {
+            $(this).unbind("scroll");
+        });
+    }
+    for (idx in synchronous_scrolling_tables) {
+        addSynchronousScrolling(synchronous_scrolling_tables[idx]);
+    }
 }
 
 function reloadTheSchedule() {
@@ -552,7 +576,7 @@ function modifyCell() {
         if (col_index == 2) { // 如果修改了计划开始日期
             console.log("修改了计划开始日期");
             console.log(row_index);
-            let pattern = /^([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12][0-9]|3[01])$/
+            let pattern = /^([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[12][0-9]|3[01])$/;
             console.log(pattern.test(new_value));
             if (current_schedule_index == 0) {
                 if (pattern.test(new_value) == false) {
