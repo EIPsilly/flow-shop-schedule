@@ -1,6 +1,5 @@
 package com.cxlotek.flowshopschedule.PO;
 
-import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 
 import java.io.Serializable;
@@ -15,7 +14,7 @@ public class BlenderOrder implements Serializable {
      * 单号
      */
     @ExcelProperty("单号")
-    private Integer orderId;
+    private String orderId;
 
     /**
      * 客户名称
@@ -75,11 +74,11 @@ public class BlenderOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public Integer getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Integer orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 

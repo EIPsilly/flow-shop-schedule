@@ -2,21 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cxlotek.flowshopschedule.dao.ScheduleDao">
     <resultMap id="BaseResultMap" type="com.cxlotek.flowshopschedule.PO.Schedule">
-        <result column="order_id" jdbcType="INTEGER" property="orderId"/>
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
         <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="product_model" jdbcType="VARCHAR" property="productModel"/>
         <result column="file_number" jdbcType="VARCHAR" property="fileNumber"/>
         <result column="date" jdbcType="TIMESTAMP" property="date"/>
         <result column="production_quantity" jdbcType="INTEGER" property="productionQuantity"/>
         <result column="line_number" jdbcType="INTEGER" property="lineNumber"/>
-        <result column="product_model" jdbcType="VARCHAR" property="productModel"/>
     </resultMap>
     <insert id="insert" parameterType="com.cxlotek.flowshopschedule.PO.Schedule">
-        insert into schedule (order_id, customer_name, file_number,
-                              `date`, production_quantity, line_number,
-                              product_model)
-        values (#{orderId,jdbcType=INTEGER}, #{customerName,jdbcType=VARCHAR}, #{fileNumber,jdbcType=VARCHAR},
-                #{date,jdbcType=TIMESTAMP}, #{productionQuantity,jdbcType=INTEGER}, #{lineNumber,jdbcType=INTEGER},
-                #{productModel,jdbcType=VARCHAR})
+        insert into schedule (order_id, customer_name, product_model,
+                              file_number, `date`, production_quantity,
+                              line_number)
+        values (#{orderId,jdbcType=VARCHAR}, #{customerName,jdbcType=VARCHAR}, #{productModel,jdbcType=VARCHAR},
+                #{fileNumber,jdbcType=VARCHAR}, #{date,jdbcType=TIMESTAMP}, #{productionQuantity,jdbcType=INTEGER},
+                #{lineNumber,jdbcType=INTEGER})
     </insert>
     <insert id="insertBatch" parameterType="java.util.List">
         insert into schedule (order_id, customer_name, file_number,
@@ -24,7 +24,7 @@
         product_model)
         values
         <foreach collection="list" item="item" separator=",">
-            (#{item.orderId,jdbcType=INTEGER},
+            (#{item.orderId,jdbcType=VARCHAR},
             #{item.customerName,jdbcType=VARCHAR},
             #{item.fileNumber,jdbcType=VARCHAR},
             #{item.date,jdbcType=TIMESTAMP},

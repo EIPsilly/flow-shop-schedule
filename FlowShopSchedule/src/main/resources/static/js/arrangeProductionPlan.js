@@ -358,6 +358,7 @@ function addTableEvent() {
     addSynchronousScrolling = function(dom) {
         dom.mouseover(function() {
             $(this).on("scroll", function() {
+                lastScrollTop = $(this).scrollTop();
                 for (idx in synchronous_scrolling_tables) {
                     synchronous_scrolling_tables[idx].scrollTop($(this).scrollTop()); // 纵向滚动条
                     synchronous_scrolling_tables[idx].scrollLeft($(this).scrollLeft()); // 横向滚动条
@@ -369,8 +370,12 @@ function addTableEvent() {
     }
     for (idx in synchronous_scrolling_tables) {
         addSynchronousScrolling(synchronous_scrolling_tables[idx]);
+        synchronous_scrolling_tables[idx].scrollTop(lastScrollTop); // 垂直滚动到上次位置
     }
 }
+
+// 记录表格上次垂直滚动的距离
+var lastScrollTop = 0;
 
 function reloadTheSchedule() {
     let row_index, col_index, table_index, have_selected_cell = false;
