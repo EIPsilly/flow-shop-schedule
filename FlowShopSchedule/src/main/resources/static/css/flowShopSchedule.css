@@ -64,6 +64,14 @@ p {
   overflow: auto;
   display: block;
 }
+#arrangeProductionPlan thead {
+  overflow: auto;
+  display: block;
+}
+#arrangeProductionPlan tfoot {
+  overflow: auto;
+  display: block;
+}
 #arrangeProductionPlan tr {
   table-layout: fixed;
   display: table;
@@ -121,6 +129,10 @@ p {
   flex: 7;
   overflow-x: auto;
 }
+#arrangeProductionPlan #arrangeArea .scheduleList table {
+  table-layout: fixed;
+}
+#arrangeProductionPlan #arrangeArea .scheduleList th,
 #arrangeProductionPlan #arrangeArea .scheduleList td {
   width: 50px;
 }

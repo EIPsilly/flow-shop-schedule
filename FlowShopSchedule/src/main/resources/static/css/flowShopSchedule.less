@@ -88,6 +88,16 @@ p{
         display: block;
     }
 
+    thead{
+        overflow: auto;
+        display: block;
+    }
+
+    tfoot{
+        overflow: auto;
+        display: block;
+    }
+
     tr{
         table-layout: fixed;
         display: table;
@@ -151,7 +161,10 @@ p{
         .scheduleList {
             flex: 7;
             overflow-x: auto;
-            td{
+            table{
+                table-layout: fixed;
+            }
+            th,td{
                 width: 50px;
             }
         }

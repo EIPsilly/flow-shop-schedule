@@ -353,18 +353,18 @@ function addTableEvent() {
         }
     })
 
-    // 添加滚动同步
+    // 添加垂直滚动同步
     synchronous_scrolling_tables = [$("#order_list table tbody"), $("#scheduleList0 table tbody"), $("#scheduleList1 table tbody")];
     addSynchronousScrolling = function(dom) {
         dom.mouseover(function() {
-            $(this).on("scroll", function() {
+            $(this).on("verticalScroll", function() {
                 lastScrollTop = $(this).scrollTop();
                 for (idx in synchronous_scrolling_tables) {
-                    synchronous_scrolling_tables[idx].scrollTop($(this).scrollTop()); // 纵向滚动条
+                    synchronous_scrolling_tables[idx].scrollTop(lastScrollTop); // 纵向滚动条
                 }
             });
         }).mouseout(function() {
-            $(this).unbind("scroll");
+            $(this).unbind("verticalScroll");
         });
     }
     for (idx in synchronous_scrolling_tables) {
@@ -373,21 +373,18 @@ function addTableEvent() {
     }
 
     // 添加水平滚动同步
-    $(".scheduleList table").children().each(function() {
-        $(this).mouseover(function() {
-            $(this).on("scroll", function() {
-                lastScrollLeft = $(this).scrollLeft();
-                $(".scheduleList table").children().each(function() {
-                    $(this).scrollLeft(lastScrollLeft);
-                })
-            });
-        }).mouseout(function() {
-            $(this).unbind("scroll");
-        });
-    })
-    $(".scheduleList table").children().each(function() {
-        $(this).scrollLeft(lastScrollLeft);
-    })
+    // $(".scheduleList table").children().each(function() {
+    //     $(this).mouseover(function() {
+    //         $(this).on("horizontalScroll", function() {
+    //             lastScrollLeft = $(this).scrollLeft();
+    //             $(".scheduleList table").children().each(function() {
+    //                 $(this).scrollLeft(lastScrollLeft);
+    //             })
+    //         });
+    //     }).mouseout(function() {
+    //         $(this).unbind("horizontalScroll");
+    //     });
+    // })
 }
 
 // 记录表格上次垂直滚动的距离
