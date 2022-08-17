@@ -20,7 +20,7 @@ function getOrderByFileName() {
                 minDate = 9999999999999;
             let tmp = function(d) {
                 if (d != null) {
-                    let date = new Date(d);
+                    let date = getDate(d);
                     minDate = Math.min(date.getTime(), minDate);
                     maxDate = Math.max(date.getTime(), maxDate);
                     return date;
@@ -34,10 +34,10 @@ function getOrderByFileName() {
                 element.plannedStartDate1 = tmp(element.plannedStartDate1);
             });
             schedule.forEach(element => {
-                element.date = element.date == null ? null : new Date(element.date);
+                element.date = element.date == null ? null : getDate(element.date);
             });
-            minDate = new Date(minDate);
-            maxDate = new Date(maxDate);
+            minDate = getDate(minDate);
+            maxDate = getDate(maxDate);
             $("#startDate").val(minDate.getFullYear() + "-" + (minDate.getMonth() + 1) + "-1");
             let endDateStr = maxDate.getFullYear() + "-" + (maxDate.getMonth() + 1) + "-";
             if ((maxDate.getMonth() + 1 == 2) &&

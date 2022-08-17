@@ -37,3 +37,11 @@ function deepCopy(obj, cache = new WeakMap()) {
     })
     return res
 }
+
+function getDate(obj) {
+    d = new Date(obj);
+    if (d.getHours() == 0) {
+        d.setHours(8);
+    }
+    return d;
+}

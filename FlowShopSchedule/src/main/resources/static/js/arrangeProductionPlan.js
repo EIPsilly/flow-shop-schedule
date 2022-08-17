@@ -16,8 +16,8 @@ var weekday = ["日", "一", "二", "三", "四", "五", "六"];
 var month = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
 var days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 var date_patt = /^[0-9]{4}-([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[12][0-9]|3[01])$/; //日期格式
-var start_date = new Date(2022, 5, 1);
-var end_date = new Date(2022, 5, 20);
+var start_date; //开始日期
+var end_date; //结束日期
 var date_num = 0; //日期数量
 var order_num = 0; //订单数量
 var cell_move_flag = true; //控制单元格是否移动
@@ -91,9 +91,9 @@ function initSchedule() {
         }
     })
     order_num = orders.length;
-    start_date = new Date($("#startDate").val());
-    end_date = new Date($("#endDate").val());
-    date_num = Math.ceil((end_date - start_date) / 3600 / 1000 / 24) + 1;
+    start_date = getDate($("#startDate").val());
+    end_date = getDate($("#endDate").val());
+    date_num = (end_date - start_date) / 3600 / 1000 / 24 + 1;
 
     default_production_quantity = [2000, 2000];
     for (let i = 0; i < schedule.length; i++) {
@@ -110,7 +110,7 @@ function initSchedule() {
             production_quantity_type[table_index][row] = new Array();
             for (let col = 0; col < date_num; col++) {
                 production_quantity[table_index][row][col] = 0;
-                let day = new Date((start_date.getTime() + col * 24 * 3600 * 1e3)).getDay();
+                let day = getDate((start_date.getTime() + col * 24 * 3600 * 1e3)).getDay();
                 if (day == 0) {
                     production_quantity_type[table_index][row][col] = "sundayCell";
                 } else if (day == 6) {
@@ -132,8 +132,8 @@ function initSchedule() {
 
 // 将生产订单转换成生产数量表
 function convertScheduleToProductionQuantity() {
-    start_date = new Date($("#startDate").val());
-    end_date = new Date($("#endDate").val());
+    start_date = getDate($("#startDate").val());
+    end_date = getDate($("#endDate").val());
     identity_to_row_index = new Map();
     for (let i in orders) {
         identity_to_row_index.set(orders[i].orderId + orders[i].customerName + orders[i].productModel, i);
@@ -145,7 +145,7 @@ function convertScheduleToProductionQuantity() {
             schedule.splice(i, 1);
             i--;
         } else if (schedule[i].customerName == "最大生产数量") {
-            let col_index = Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
+            let col_index = (schedule[i].date - start_date) / 3600 / 1000 / 24
             residual_production_quantity[schedule[i].lineNumber][col_index] = schedule[i].productionQuantity;
             max_production_quantity[schedule[i].lineNumber][col_index] = schedule[i].productionQuantity;
         }
@@ -154,7 +154,7 @@ function convertScheduleToProductionQuantity() {
         schedule[i].date = new Date(schedule[i].date)
         if ((schedule[i].customerName != "最大生产数量") && (schedule[i].customerName != "默认最大生产数量")) {
             let row_index = identity_to_row_index.get(schedule[i].orderId + schedule[i].customerName + schedule[i].productModel)
-            let col_index = Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
+            let col_index = (schedule[i].date - start_date) / 3600 / 1000 / 24
             console.log("convertScheduleToProductionQuantity");
             console.log("i : ", i);
             console.log("schedule[i] : ", schedule[i]);
@@ -173,14 +173,14 @@ function convertScheduleToProductionQuantity() {
             continue;
         }
         if (orders[row_index].plannedStartDate0 != null && orders[row_index].plannedStartDate1 == null) {
-            let col_index = Math.ceil((orders[row_index].plannedStartDate0 - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
+            let col_index = (orders[row_index].plannedStartDate0 - start_date) / 3600 / 1000 / 24;
             orders[row_index].residual_quantity = automaticallyAllocate(0, row_index, col_index, orders[row_index].residual_quantity);
         } else if (orders[row_index].plannedStartDate0 == null && orders[row_index].plannedStartDate1 != null) {
-            let col_index = Math.ceil((orders[row_index].plannedStartDate1 - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
+            let col_index = (orders[row_index].plannedStartDate1 - start_date) / 3600 / 1000 / 24;
             orders[row_index].residual_quantity = automaticallyAllocate(1, row_index, col_index, orders[row_index].residual_quantity);
         } else if (orders[row_index].plannedStartDate0 != null && orders[row_index].plannedStartDate1 != null) {
-            let col_index0 = Math.ceil((orders[row_index].plannedStartDate0 - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
-            let col_index1 = Math.ceil((orders[row_index].plannedStartDate1 - start_date) / 3600 / 1000 / 24) //差8时区，向上取整
+            let col_index0 = (orders[row_index].plannedStartDate0 - start_date) / 3600 / 1000 / 24;
+            let col_index1 = (orders[row_index].plannedStartDate1 - start_date) / 3600 / 1000 / 24;
             let quantity0 = Math.floor(orders[row_index].residual_quantity / 2);
             let quantity1 = orders[row_index].residual_quantity - quantity0;
             orders[row_index].residual_quantity = automaticallyAllocate(0, row_index, col_index0, quantity0) + automaticallyAllocate(1, row_index, col_index1, quantity1);
@@ -209,9 +209,9 @@ function automaticallyAllocate(table_index, row_index, col_index, quantity) {
 
 // 打印生产数量安排表
 function scheduleList(table_index) {
-    start_date = new Date($("#startDate").val());
-    end_date = new Date($("#endDate").val());
-    date_num = Math.ceil((end_date - start_date) / 3600 / 1000 / 24) + 1;
+    start_date = getDate($("#startDate").val());
+    end_date = getDate($("#endDate").val());
+    date_num = (end_date - start_date) / 3600 / 1000 / 24 + 1;
 
     table = $("#scheduleList" + table_index + " table")
     let str = `<thead><tr>\n`,
@@ -611,7 +611,7 @@ function modifyCell() {
                 if (pattern.test(new_value) == false) {
                     orders[row_index].plannedStartDate0 = null;
                 } else {
-                    orders[row_index].plannedStartDate0 = new Date(new_value);
+                    orders[row_index].plannedStartDate0 = getDate(new_value);
                     orders[row_index].plannedStartDate0.setFullYear(start_date.getFullYear());
                 }
             }
@@ -619,7 +619,7 @@ function modifyCell() {
                 if (pattern.test(new_value) == false) {
                     orders[row_index].plannedStartDate1 = null;
                 } else {
-                    orders[row_index].plannedStartDate1 = new Date(new_value);
+                    orders[row_index].plannedStartDate1 = getDate(new_value);
                     orders[row_index].plannedStartDate1.setFullYear(start_date.getFullYear());
                 }
             }
@@ -632,7 +632,7 @@ function modifyCell() {
                     orders[row_index].orderId = new_value;
                     break;
                 case 3:
-                    orders[row_index].plannedEndDate = new Date(new_value);
+                    orders[row_index].plannedEndDate = getDate(new_value);
                     orders[row_index].plannedEndDate.setFullYear(start_date.getFullYear());
                     break;
                 case 4:
@@ -658,7 +658,7 @@ function modifyCell() {
             if (schedule[i].orderId == null &&
                 schedule[i].customerName == "最大生产数量" &&
                 schedule[i].fileNumber == $("#currentFile").text() &&
-                Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) == col_index &&
+                (schedule[i].date - start_date) / 3600 / 1000 / 24 == col_index &&
                 schedule[i].lineNumber == table_index) {
                 exist = true;
                 schedule[i].productionQuantity = new_value;
@@ -671,7 +671,7 @@ function modifyCell() {
                 "orderId": null,
                 "customerName": "最大生产数量",
                 "fileNumber": $("#currentFile").text(),
-                "date": new Date(start_date.getTime() + col_index * 24 * 3600 * 1e3),
+                "date": getDate(start_date.getTime() + col_index * 24 * 3600 * 1e3),
                 "productionQuantity": new_value,
                 "lineNumber": table_index,
                 "productModel": null
@@ -693,7 +693,7 @@ function modifyCell() {
                 schedule[i].customerName == orders[row_index].customerName &&
                 schedule[i].productModel == orders[row_index].productModel &&
                 schedule[i].fileNumber == $("#currentFile").text() &&
-                Math.ceil((schedule[i].date - start_date) / 3600 / 1000 / 24) == col_index &&
+                (schedule[i].date - start_date) / 3600 / 1000 / 24 == col_index &&
                 schedule[i].lineNumber == table_index) {
                 exist = true;
                 schedule[i].productionQuantity = new_value;
@@ -705,7 +705,7 @@ function modifyCell() {
                 "orderId": orders[row_index].orderId,
                 "customerName": orders[row_index].customerName,
                 "fileNumber": $("#currentFile").text(),
-                "date": new Date(start_date.getTime() + col_index * 24 * 3600 * 1e3),
+                "date": getDate(start_date.getTime() + col_index * 24 * 3600 * 1e3),
                 "productionQuantity": new_value,
                 "lineNumber": table_index,
                 "productModel": orders[row_index].productModel
