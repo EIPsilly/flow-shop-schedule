@@ -151,12 +151,16 @@ public class ArrangeProductionPlanController {
         list.add(new ArrayList<String>(Arrays.asList("订单数量")));
         list.add(new ArrayList<String>(Arrays.asList("产品型号")));
         list.add(new ArrayList<String>(Arrays.asList("剩余数量")));
-        endCalendar.add(Calendar.DATE, 1);
+
 
         Calendar tmp = Calendar.getInstance();
         tmp.setTime(startCalendar.getTime());
 
-        while (tmp.before(endCalendar)) {
+        Calendar tmp2 = Calendar.getInstance();
+        tmp2.setTime(endCalendar.getTime());
+        tmp2.add(Calendar.DATE, 1);
+
+        while (tmp.before(tmp2)) {
             list.add(new ArrayList<String>(Arrays.asList(new SimpleDateFormat("MM-dd").format(tmp.getTime()))));
             tmp.add(Calendar.DATE, 1);
         }
