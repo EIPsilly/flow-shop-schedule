@@ -1,5 +1,5 @@
-var host = "http://127.0.0.1:8080"
-    // var host = ""
+// const host = "http://127.0.0.1:8080"
+const host = ""
 
 // arrangeProductionPlan.js
 
@@ -80,6 +80,45 @@ function saveArrange() {
             alert("保存失败，请联系管理员");
         }
     })
+}
+
+function exportExcel() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("post", host + "/ArrangeProductionPlan/exportExcel", true);
+    xhr.responseType = "blob";
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function(oEvent) {
+        if (this.status == 200) {
+            var content = this.response;
+            var elink = document.createElement('a');
+            elink.download = $("#currentFile").text();
+            elink.style.display = 'none';
+
+            var blob = new Blob([content]);
+            elink.href = URL.createObjectURL(blob);
+
+            document.body.appendChild(elink);
+            elink.click();
+
+            document.body.removeChild(elink);
+        } else {
+            console.log(this.response);
+            alert("导出失败，请联系管理员");
+        }
+    };
+    xhr.send(JSON.stringify({
+        "fileNumber": $("#currentFile").text(),
+        "start_date": start_date,
+        "end_date": end_date,
+        "date_num": date_num,
+        "order_num": order_num,
+        "production_quantity": production_quantity,
+        "production_quantity_type": production_quantity_type,
+        "max_production_quantity": max_production_quantity,
+        "residual_production_quantity": residual_production_quantity,
+        "default_production_quantity": default_production_quantity,
+        "orders": orders
+    }));
 }
 
 // chooseFile.js

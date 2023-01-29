@@ -21,12 +21,12 @@ var end_date; //结束日期
 var date_num = 0; //日期数量
 var order_num = 0; //订单数量
 var cell_move_flag = true; //控制单元格是否移动
-var production_quantity = new Array();
-var production_quantity_type = new Array();
-var max_production_quantity = new Array();
-var residual_production_quantity = new Array();
-var default_production_quantity = new Array();
-var synchronous_scrolling_tables = new Array();
+var production_quantity = new Array(); //流水线一、二的每个订单的每天生产数量安排
+var production_quantity_type = new Array(); //单元格的样式
+var max_production_quantity = new Array(); //流水线一、二的每天可安排的生产数量
+var residual_production_quantity = new Array(); //剩余可安排生产数量
+var default_production_quantity = new Array(); //流水线一、二的默认可安排生产数量
+var synchronous_scrolling_tables = new Array(); //需要垂直同步的表格
 
 // 流水表开始日期
 $("#startDate").blur(function() {
@@ -79,6 +79,10 @@ $("#switchSchedule").click(function() {
 // 保存流水表
 $("#saveArrange").click(function() {
     saveArrange();
+})
+
+$("#exportExcel").click(function() {
+    exportExcel();
 })
 
 // 初始化生产数量安排表、最大数量表、剩余数量表
